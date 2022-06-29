@@ -1,0 +1,33 @@
+{
+  "name": "vk-api-schema-parser",
+  "version": "1.0.0",
+  "description": "Parse JSON-Schema from the official git repository of VKontakte",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "postinstall": "tsc -p tsconfig.json",
+    "wDebug": "@powershell -Command $env:DEBUG='*';node dist/index.js",
+    "uDebug": "DEBUG=* node dist/index.js"
+  },
+  "dependencies": {
+    "@types/node": "^17.0.22",
+    "debug": "^4.3.4",
+    "tsc": "^2.0.4",
+    "typescript": "^4.6.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0"
+  },
+  "keywords": [
+    "VK",
+    "Code Generation",
+    "Schema"
+  ],
+  "author": "Ripretention",
+  "license": "ISC"
+}
