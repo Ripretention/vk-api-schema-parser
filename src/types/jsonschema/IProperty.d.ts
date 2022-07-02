@@ -12,7 +12,7 @@ export interface IReferenceProperty {
 	description?: string;
 }
 export interface IEnumProperty<T extends PropertyType> extends IProperty<T> {
-	enum: T[];
+	enum: any[];
 }
 export interface IArrayProperty extends IProperty<"array"> {
 	items: IArrayProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
