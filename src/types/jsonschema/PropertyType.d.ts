@@ -1,4 +1,5 @@
 export type PropertyType = 
+	PropertyType[] |
 	"integer" | 
 	"boolean" |
 	"string" |

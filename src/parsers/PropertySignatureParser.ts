@@ -15,7 +15,8 @@ export class PropertySignatureParser {
 			this.typeSignatureResolver.resolve(object)
 		);
 		
-		this.jsDocGenerator.generate(prop, object);
+		if (object.description)
+			this.jsDocGenerator.generate(prop, object);
 		return prop;
 	}
 }

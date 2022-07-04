@@ -15,7 +15,8 @@ export interface IEnumProperty<T extends PropertyType> extends IProperty<T> {
 	enum: any[];
 }
 export interface IArrayProperty extends IProperty<"array"> {
-	items: IArrayProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
+	items?: IArrayProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
+	prefixItems?: IProperty<any>[];
 }
 export interface IObjectProperty extends IProperty<"object"> {
 	properties: {

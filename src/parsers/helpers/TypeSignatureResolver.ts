@@ -1,5 +1,6 @@
 import * as ts from "typescript";
 import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../../types/jsonschema/IProperty";
+import { PropertyType } from "../../types/jsonschema/PropertyType";
 
 type SupportedTypes = IProperty<any> | IArrayProperty | IObjectProperty | IEnumProperty<any>;
 export class TypeSignatureResolver {
@@ -8,7 +9,9 @@ export class TypeSignatureResolver {
 			return this.resolveEnumType(object);
 		if (this.isArrayType(object))
 			return this.resolveArrayType(object);
-		
+		if (this.isMixedType(object))
+			return this.resolveMixedType(object);
+
 		return ts.factory.createKeywordTypeNode(this.resolvePrimitiveType(object));
 	}
 
@@ -16,7 +19,10 @@ export class TypeSignatureResolver {
 		return (object as IEnumProperty<any>)?.enum?.length != null;
 	}
 	private isArrayType(object: SupportedTypes): object is IArrayProperty {
-		return (object as IArrayProperty)?.items != null;
+		return object?.type === "array" || (object as IArrayProperty)?.items != null;
+	}
+	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
+		return object?.type && Array.isArray(object.type);
 	}
 	public resolveEnumType(object: IEnumProperty<any>) {
 		let enumMembers = [];
@@ -40,10 +46,29 @@ export class TypeSignatureResolver {
 			: this.resolvePrimitiveType(object);
 	}
 	public resolveArrayType(object: IArrayProperty) {
+		if (object.prefixItems?.length) {
+			if (object.items)
+				object.prefixItems.push(object.items);
+
+			return ts.factory.createTupleTypeNode(object.prefixItems.map(this.resolve.bind(this)));
+		}
+
 		return ts.factory.createArrayTypeNode(this.resolve(object.items));
 	}
+	public resolveMixedType(object: IProperty<PropertyType[]>) {
+		let types = [...new Set(object.type)]; // distinct array
+		
+		return ts.factory.createUnionTypeNode(
+			types.map(type => 
+				this.resolve({
+					...object,
+					type
+				})
+			)
+		);
+	}
 	public resolvePrimitiveType(object: IProperty<any>) {
-		switch (object.type) {
+		switch (object?.type) {
 			case "number":
 			case "integer":
 				return ts.SyntaxKind.NumberKeyword;
