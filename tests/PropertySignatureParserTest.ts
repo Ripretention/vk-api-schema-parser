@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { PropertySignatureParser } from "../src/parsers/PropertySignatureParser";
-import { IArrayProperty, IEnumProperty, IProperty } from "../src/types/jsonschema/IProperty";
+import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../src/types/jsonschema/IProperty";
 import { PropertyType } from "../src/types/jsonschema/PropertyType";
 
 const parser = new PropertySignatureParser();
@@ -89,9 +89,10 @@ describe("array property test", () => {
 	});
 });
 describe("tuple property test", () => {
-	test("should return a primitive tuple", () => 
-		tuplePropTypeTest(
-			[
+	test("should return a primitive tuple", () => {
+		let tupleProperty: IArrayProperty = {
+			type: "array",
+			prefixItems: [
 				{
 					type: "number"
 				},
@@ -99,8 +100,18 @@ describe("tuple property test", () => {
 					type: "string"
 				}
 			]
-		)
-	);
+		};
+
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("tuple", tupleProperty),
+			undefined
+		);
+
+		expect(result.replace(/\s/g, "")).toBe(`
+			tuple: [number, string];
+		`.replace(/\s/g, ""));
+	});
 
 	test("should return a mixed tuple", () => {
 		let tupleProperty: IArrayProperty = {
@@ -137,6 +148,104 @@ describe("tuple property test", () => {
 
 		expect(result.replace(/\s/g, "")).toBe(`
 			tuple: [string, string[], 2 | 3 | 4, string | boolean];
+		`.replace(/\s/g, ""));
+	});
+});
+describe("object property test", () => {
+	test("should return a object with a primitive properties", () => {
+		let tupleProperty: IObjectProperty = {
+			type: "object",
+			properties: {
+				"prop1": {
+					type: "string"
+				},
+				"prop2": {
+					"type": "number"
+				},
+				"prop3": {
+					"type": "boolean"
+				}
+			}
+		};
+
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("object", tupleProperty),
+			undefined
+		);
+
+		expect(result.replace(/\s/g, "")).toBe(`
+			object: {
+				prop1: string;
+				prop2: number;
+				prop3: boolean;
+			};
+		`.replace(/\s/g, ""));
+	});
+
+	test("should return a object with a complex properties", () => {
+		let tupleProperty: IObjectProperty = {
+			type: "object",
+			properties: {
+				"tupleProp": {
+					type: "array",
+					prefixItems: [
+						{
+							type: "string"
+						},
+						{
+							type: "number"
+						}
+					]
+				},
+				"enumProp": {
+					type: "string",
+					enum: [
+						"long",
+						"big",
+						"clear",
+						"sky"
+					]
+				},
+				"arrayProp": {
+					type: "array",
+					items: {
+						type: "boolean"
+					}
+				},
+				"mixedProp": {
+					type: ["number", "string", "boolean"]
+				},
+				"objectProp": {
+					type: "object",
+					properties: {
+						"field": {
+							type: "array",
+							items: {
+								type: ["number", "string"]
+							}
+						}
+					}
+				}
+			}
+		};
+
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("object", tupleProperty),
+			undefined
+		);
+
+		expect(result.replace(/\s/g, "")).toBe(`
+			object: {
+				tupleProp: [string, number];
+				enumProp: "long" | "big" | "clear" | "sky";
+				arrayProp: boolean[];
+				mixedProp: number | string | boolean;
+				objectProp: {
+					field: (number | string)[];
+				};
+			};
 		`.replace(/\s/g, ""));
 	});
 });
@@ -204,25 +313,5 @@ function arrayPropTypeTest(
 	const result = printer.printNode(ts.EmitHint.Unspecified, prop, undefined);
 	expect(result.replace(/\s/g, "")).toBe(`
 		${isReadonly ? "readonly " : ""}test${isOptional ? "?:" : ":"} ${expectedType}[];
-	`.replace(/\s/g, ""));
-}
-function tuplePropTypeTest(
-	types: IProperty<any>[], 
-	isReadonly = false, 
-	isOptional = false, 
-	items?: IProperty<any>
-) {
-	let prop = parser.parse("test", {
-		type: "array",
-		prefixItems: types,
-		items: items,
-	} as IArrayProperty, isReadonly, isOptional);
-
-	if (items)
-		types.push(items);
-
-	const result = printer.printNode(ts.EmitHint.Unspecified, prop, undefined);
-	expect(result.replace(/\s/g, "")).toBe(`
-		${isReadonly ? "readonly " : ""}test${isOptional ? "?:" : ":"} [${types.map(obj => obj.type).join(",")}];
 	`.replace(/\s/g, ""));
 }

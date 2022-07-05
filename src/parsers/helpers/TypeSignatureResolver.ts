@@ -9,6 +9,8 @@ export class TypeSignatureResolver {
 			return this.resolveEnumType(object);
 		if (this.isArrayType(object))
 			return this.resolveArrayType(object);
+		if (this.isObjectType(object))
+			return this.resolveObjectType(object);
 		if (this.isMixedType(object))
 			return this.resolveMixedType(object);
 
@@ -16,10 +18,13 @@ export class TypeSignatureResolver {
 	}
 
 	private isEnumType(object: SupportedTypes): object is IEnumProperty<any> {
-		return (object as IEnumProperty<any>)?.enum?.length != null;
+		return (object as IEnumProperty<any>)?.enum?.length !== undefined;
 	}
 	private isArrayType(object: SupportedTypes): object is IArrayProperty {
-		return object?.type === "array" || (object as IArrayProperty)?.items != null;
+		return object?.type === "array" || (object as IArrayProperty)?.items !== undefined;
+	}
+	private isObjectType(object: SupportedTypes): object is IObjectProperty {
+		return object?.type === "object" || (object as IObjectProperty)?.properties !== undefined;
 	}
 	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
@@ -54,6 +59,26 @@ export class TypeSignatureResolver {
 		}
 
 		return ts.factory.createArrayTypeNode(this.resolve(object.items));
+	}
+	public resolveObjectType(object: IObjectProperty) {
+		let properties = [];
+
+		for (let [propertyName, property] of Object.entries(object.properties)) {
+			properties.push(ts.factory.createPropertySignature(
+				[],
+				ts.factory.createIdentifier(propertyName),
+				undefined,
+				this.resolve(property)
+			));
+		}
+
+		return ts.factory.createTypeAliasDeclaration(
+			[],
+			[],
+			undefined,
+			undefined,
+			ts.factory.createTypeLiteralNode(properties)
+		).type;
 	}
 	public resolveMixedType(object: IProperty<PropertyType[]>) {
 		let types = [...new Set(object.type)]; // distinct array
