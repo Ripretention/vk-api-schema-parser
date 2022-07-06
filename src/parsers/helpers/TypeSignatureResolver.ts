@@ -1,9 +1,12 @@
 import * as ts from "typescript";
-import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../../types/jsonschema/IProperty";
 import { PropertyType } from "../../types/jsonschema/PropertyType";
+import type { TypeMetadataResolver } from "./TypeMetadataResolver";
+import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../../types/jsonschema/IProperty";
 
 type SupportedTypes = IProperty<any> | IArrayProperty | IObjectProperty | IEnumProperty<any>;
 export class TypeSignatureResolver {
+	constructor(private readonly metadataResolver: TypeMetadataResolver = null) {}
+	
 	public resolve(object: SupportedTypes) {
 		if (this.isEnumType(object))
 			return this.resolveEnumType(object);
@@ -64,12 +67,16 @@ export class TypeSignatureResolver {
 		let properties = [];
 
 		for (let [propertyName, property] of Object.entries(object.properties)) {
-			properties.push(ts.factory.createPropertySignature(
+			let propSignature = ts.factory.createPropertySignature(
 				[],
 				ts.factory.createIdentifier(propertyName),
 				undefined,
 				this.resolve(property)
-			));
+			);
+
+			properties.push( 
+				this.metadataResolver?.resolve(propSignature, property) ?? propSignature
+			);
 		}
 
 		return ts.factory.createTypeAliasDeclaration(

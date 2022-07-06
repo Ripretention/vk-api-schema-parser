@@ -1,9 +1,10 @@
 import * as ts from "typescript";
-import { PropertySignatureParser } from "../src/parsers/PropertySignatureParser";
-import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../src/types/jsonschema/IProperty";
 import { PropertyType } from "../src/types/jsonschema/PropertyType";
+import { PropertySignatureParser } from "../src/parsers/PropertySignatureParser";
+import { TypeMetadataResolver } from "../src/parsers/helpers/TypeMetadataResolver";
+import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../src/types/jsonschema/IProperty";
 
-const parser = new PropertySignatureParser();
+const parser = new PropertySignatureParser(new TypeMetadataResolver());
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
 describe("primitive property test", () => {
@@ -223,7 +224,8 @@ describe("object property test", () => {
 							type: "array",
 							items: {
 								type: ["number", "string"]
-							}
+							},
+							description: "what is it!?"
 						}
 					}
 				}
@@ -243,6 +245,9 @@ describe("object property test", () => {
 				arrayProp: boolean[];
 				mixedProp: number | string | boolean;
 				objectProp: {
+					/**
+					* what is it!?
+					*/
 					field: (number | string)[];
 				};
 			};
