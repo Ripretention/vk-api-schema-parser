@@ -1,9 +1,8 @@
-name: Node.js CI
+name: build-test
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
+  push:
     branches: [ "master" ]
 
 jobs:
