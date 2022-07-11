@@ -254,6 +254,145 @@ describe("object property test", () => {
 		`.replace(/\s/g, ""));
 	});
 });
+describe("union property test", () => {
+	test("should return a primitive union (allOf)", () => {
+		let allOfProp: IProperty<any> = {
+			type: undefined,
+			allOf: [
+				{
+					type: "string"
+				},
+				{
+					type: "number"
+				}
+			]
+		};
+	
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("allOf", allOfProp),
+			undefined
+		);
+	
+		expect(result.replace(/\s/g, "")).toBe(`
+			allOf: string & number;
+		`.replace(/\s/g, ""));
+	});
+	test("should return a primitive union (anyOf)", () => {
+		let anyOfProp: IProperty<any> = {
+			type: undefined,
+			anyOf: [
+				{
+					type: "boolean"
+				},
+				{
+					type: ["number", "string"]
+				}
+			]
+		};
+	
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("anyOf", anyOfProp),
+			undefined
+		);
+	
+		expect(result.replace(/\s/g, "")).toBe(`
+			anyOf: boolean | (number | string);
+		`.replace(/\s/g, ""));
+	});
+
+	test("should return a complex union (allOf)", () => {
+		let allOfProp: IProperty<any> = {
+			type: undefined,
+			allOf: [
+				{
+					type: "array",
+					items: {
+						type: "string"
+					}
+				} as IArrayProperty,
+				{
+					type: "array",
+					prefixItems: [
+						{
+							type: "boolean"
+						},
+						{
+							type: ["number", "string"]
+						}
+					]
+				} as IArrayProperty,
+				{
+					type: "object",
+					properties: {
+						fF: {
+							type: "string"
+						},
+						sF: {
+							type: "integer"
+						}
+					}
+				} as IObjectProperty
+			]
+		};
+	
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("allOf", allOfProp),
+			undefined
+		);
+	
+		expect(result.replace(/\s/g, "")).toBe(`
+			allOf: 
+				string[] & 
+				[boolean, number | string] & 
+				{ 
+					fF: string; 
+					sF: number; 
+				};
+		`.replace(/\s/g, ""));
+	});
+	test("should return a primitive union (oneOf)", () => {
+		let oneOfProp: IProperty<any> = {
+			type: undefined,
+			oneOf: [
+				{
+					type: "object",
+					properties: {
+						"f": {
+							type: "string",
+							description: "some field"
+						}
+					}
+				} as IObjectProperty,
+				{
+					type: ["string", "number"],
+					enum: [
+						"qwe",
+						321
+					]
+				} as IEnumProperty<["string", "number"]>
+			]
+		};
+	
+		const result = printer.printNode(
+			ts.EmitHint.Unspecified, 
+			parser.parse("oneOf", oneOfProp),
+			undefined
+		);
+	
+		expect(result.replace(/\s/g, "")).toBe(`
+			oneOf: {
+				/**
+				* some field
+				*/
+				f: string;
+			} | ("qwe" | 321);
+		`.replace(/\s/g, ""));
+	});
+	
+});
 
 function primitivePropTypeTest(
 	type: PropertyType, 

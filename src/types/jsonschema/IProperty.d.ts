@@ -4,6 +4,7 @@ export interface IProperty<T extends PropertyType> {
 	type: T;
 	const?: T;
 	description?: string;
+	allOf?: IProperty<any>[];
 	oneOf?: IProperty<any>[];
 	anyOf?: IProperty<any>[];
 }

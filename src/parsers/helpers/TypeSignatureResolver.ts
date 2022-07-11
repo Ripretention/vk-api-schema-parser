@@ -8,6 +8,8 @@ export class TypeSignatureResolver {
 	constructor(private readonly metadataResolver: TypeMetadataResolver = null) {}
 	
 	public resolve(object: SupportedTypes) {
+		if (this.isUnionType(object))
+			return this.resolveUnionType(object);
 		if (this.isEnumType(object))
 			return this.resolveEnumType(object);
 		if (this.isArrayType(object))
@@ -20,6 +22,11 @@ export class TypeSignatureResolver {
 		return ts.factory.createKeywordTypeNode(this.resolvePrimitiveType(object));
 	}
 
+	private isUnionType(object: SupportedTypes): object is IProperty<any> {
+		return ["anyOf", "oneOf", "allOf"]
+			.map(p => object?.[p]?.length ?? 0)
+			.find(p => p > 0) !== undefined;
+	}
 	private isEnumType(object: SupportedTypes): object is IEnumProperty<any> {
 		return (object as IEnumProperty<any>)?.enum?.length !== undefined;
 	}
@@ -32,12 +39,22 @@ export class TypeSignatureResolver {
 	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
 	}
+	public resolveUnionType(object: IProperty<any>) {
+		if (object.hasOwnProperty("allOf"))
+			return ts.factory.createIntersectionTypeNode(object.allOf.map(this.resolve.bind(this)));
+		else if (object.hasOwnProperty("anyOf") || object.hasOwnProperty("oneOf"))
+			return ts.factory.createUnionTypeNode(
+				object[object.hasOwnProperty("anyOf") ? "anyOf" : "oneOf"].map(this.resolve.bind(this))
+			);
+	}
 	public resolveEnumType(object: IEnumProperty<any>) {
 		let enumMembers = [];
 		for (let item of object.enum) {
-			let type = object.type 
-				? object.type
-				: typeof(item);
+			let type = typeof(item);
+
+			let availableTypes = [object?.type].flat(2).filter(t => t != null);
+			if (availableTypes.length > 0 && !availableTypes.includes(type))
+				continue;
 			
 			if (type === "number")
 				enumMembers.push(ts.factory.createNumericLiteral(item));
