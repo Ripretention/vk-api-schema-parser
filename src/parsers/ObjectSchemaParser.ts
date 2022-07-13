@@ -1,8 +1,9 @@
 import * as ts from "typescript";
 import { ISchema } from "../types/jsonschema/ISchema";
 import { ISchemaParser } from "../types/ISchemaParser";
-import { TypeMetadataResolver } from "./helpers/TypeMetadataResolver";
+import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
 import { PropertySignatureParser } from "./PropertySignatureParser";
+import { toPascalCase } from "../Utils";
 
 export class ObjectSchemaParser implements ISchemaParser<ISchema> {
 	constructor(private readonly metadataResolver: TypeMetadataResolver = new TypeMetadataResolver()) {}
@@ -33,6 +34,6 @@ export class ObjectSchemaParser implements ISchemaParser<ISchema> {
 		return ts.factory.createNodeArray(objects);
 	}
 	private normalizeName(name: string) {
-		return "I" + name.replace(/(?:^|_)(\w{1})/gi, (_, v) => v.toUpperCase());
+		return "I" + toPascalCase(name);
 	}
 }

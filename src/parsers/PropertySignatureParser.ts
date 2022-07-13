@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import { IProperty } from "../types/jsonschema/IProperty";
-import { TypeMetadataResolver } from "./helpers/TypeMetadataResolver";
-import { TypeSignatureResolver } from "./helpers/TypeSignatureResolver";
+import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
+import { TypeSignatureResolver } from "../resolvers/TypeSignatureResolver";
 
 export class PropertySignatureParser {
 	constructor(private readonly metadataResolver: TypeMetadataResolver = new TypeMetadataResolver()) {}

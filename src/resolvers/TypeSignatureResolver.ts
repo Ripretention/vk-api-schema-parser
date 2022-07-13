@@ -1,13 +1,16 @@
 import * as ts from "typescript";
-import { PropertyType } from "../../types/jsonschema/PropertyType";
+import { PropertyType } from "../types/jsonschema/PropertyType";
 import type { TypeMetadataResolver } from "./TypeMetadataResolver";
-import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../../types/jsonschema/IProperty";
+import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty, IReferenceProperty } from "../types/jsonschema/IProperty";
+import { toPascalCase } from "../Utils";
 
-type SupportedTypes = IProperty<any> | IArrayProperty | IObjectProperty | IEnumProperty<any>;
+type SupportedTypes = IArrayProperty | IReferenceProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
 export class TypeSignatureResolver {
 	constructor(private readonly metadataResolver: TypeMetadataResolver = null) {}
 	
 	public resolve(object: SupportedTypes) {
+		if (this.isReferenceType(object))
+			return this.resolveReferenceType(object);
 		if (this.isUnionType(object))
 			return this.resolveUnionType(object);
 		if (this.isEnumType(object))
@@ -22,6 +25,9 @@ export class TypeSignatureResolver {
 		return ts.factory.createKeywordTypeNode(this.resolvePrimitiveType(object));
 	}
 
+	private isReferenceType(object: SupportedTypes): object is IReferenceProperty {
+		return (object as IReferenceProperty)?.$ref !== undefined;
+	}
 	private isUnionType(object: SupportedTypes): object is IProperty<any> {
 		return ["anyOf", "oneOf", "allOf"]
 			.map(p => object?.[p]?.length ?? 0)
@@ -38,6 +44,10 @@ export class TypeSignatureResolver {
 	}
 	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
+	}
+	public resolveReferenceType(object: IReferenceProperty) {
+		let { 2: reference } = object.$ref.match(/^([^#]+)?#\/definitions\/(.+)/);
+		return ts.factory.createIdentifier("I" + toPascalCase(reference));
 	}
 	public resolveUnionType(object: IProperty<any>) {
 		if (object.hasOwnProperty("allOf"))

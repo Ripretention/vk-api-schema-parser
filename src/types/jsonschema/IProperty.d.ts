@@ -8,7 +8,7 @@ export interface IProperty<T extends PropertyType> {
 	oneOf?: IProperty<any>[];
 	anyOf?: IProperty<any>[];
 }
-export interface IReferenceProperty {
+export interface IReferenceProperty extends IProperty<any> {
 	$ref: string;
 	description?: string;
 }
