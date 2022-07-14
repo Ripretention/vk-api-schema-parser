@@ -13,27 +13,25 @@ export class ObjectSchemaParser implements ISchemaParser<ISchema> {
 		let objects = [];
 		for (let [name, body] of Object.entries(schema.definitions)) {
 			let prop = this.propSignatureParser.parse(name, body);
-
-			let interfaceSignature = ts.factory.createInterfaceDeclaration(
-				undefined,
-				undefined,
-				this.normalizeName(name),
-				undefined,
-				undefined,
-				(body.type === "object"
-					? (prop.type as ts.TypeLiteralNode).members
-					: [prop]
+			let object = body?.type === "object"
+				? ts.factory.createInterfaceDeclaration(
+					undefined,
+					undefined,
+					toPascalCase(name),
+					undefined,
+					undefined,
+					(body.type === "object"
+						? (prop.type as ts.TypeLiteralNode).members
+						: [prop]
+					)
 				)
-			);
+				: ts.factory.createTypeAliasDeclaration([], [], toPascalCase(name), undefined, prop.type);
 
 			objects.push(
-				this.metadataResolver?.resolve(interfaceSignature, body) ??	interfaceSignature
+				this.metadataResolver?.resolve(object, body) ?? object
 			);
 		}
 
 		return ts.factory.createNodeArray(objects);
-	}
-	private normalizeName(name: string) {
-		return "I" + toPascalCase(name);
 	}
 }

@@ -20,13 +20,21 @@ export class PropertySignatureParser {
 			? ts.factory.createToken(ts.SyntaxKind.QuestionToken) 
 			: undefined;
 
-		let prop = ts.factory.createPropertySignature(
-			readonlyKeyword,
-			ts.factory.createIdentifier(objectId),
-			optinalKeyword,
-			this.typeSignatureResolver.resolve(object)
-		);
-		
-		return this.metadataResolver?.resolve(prop, object) ?? prop;
+		try {
+			let prop = ts.factory.createPropertySignature(
+				readonlyKeyword,
+				ts.factory.createIdentifier(objectId),
+				optinalKeyword,
+				this.typeSignatureResolver.resolve(object)
+			);
+
+			if (prop.type === undefined)
+				console.log(objectId);
+			
+			return this.metadataResolver?.resolve(prop, object) ?? prop;
+		} catch (err) {
+			err.message += ` (prop: ${objectId})`;
+			throw err;
+		}
 	}
 }

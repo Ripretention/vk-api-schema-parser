@@ -34,13 +34,13 @@ export class TypeSignatureResolver {
 			.find(p => p > 0) !== undefined;
 	}
 	private isEnumType(object: SupportedTypes): object is IEnumProperty<any> {
-		return (object as IEnumProperty<any>)?.enum?.length !== undefined;
+		return ((object as IEnumProperty<any>)?.enum?.length ?? 0) > 0;
 	}
 	private isArrayType(object: SupportedTypes): object is IArrayProperty {
 		return object?.type === "array" || (object as IArrayProperty)?.items !== undefined;
 	}
 	private isObjectType(object: SupportedTypes): object is IObjectProperty {
-		return object?.type === "object" || (object as IObjectProperty)?.properties !== undefined;
+		return object?.type === "object" || ((object as IObjectProperty)?.properties?.length ?? 0) > 0;
 	}
 	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
@@ -62,7 +62,10 @@ export class TypeSignatureResolver {
 		for (let item of object.enum) {
 			let type = typeof(item);
 
-			let availableTypes = [object?.type].flat(2).filter(t => t != null);
+			let availableTypes = [object?.type]
+				.flat(2)
+				.filter(t => t != null)
+				.map(t => t === "integer" ? "number" : t);
 			if (availableTypes.length > 0 && !availableTypes.includes(type))
 				continue;
 			
@@ -93,7 +96,7 @@ export class TypeSignatureResolver {
 	public resolveObjectType(object: IObjectProperty) {
 		let properties = [];
 
-		for (let [propertyName, property] of Object.entries(object.properties)) {
+		for (let [propertyName, property] of Object.entries(object?.properties ?? {})) {
 			let propSignature = ts.factory.createPropertySignature(
 				[],
 				ts.factory.createIdentifier(propertyName),
@@ -106,13 +109,21 @@ export class TypeSignatureResolver {
 			);
 		}
 
-		return ts.factory.createTypeAliasDeclaration(
-			[],
-			[],
-			undefined,
-			undefined,
-			ts.factory.createTypeLiteralNode(properties)
-		).type;
+		return properties.length === 0 
+			? ts.factory.createTypeReferenceNode(
+				"Record", 
+				[
+					ts.SyntaxKind.StringKeyword, 
+					ts.SyntaxKind.AnyKeyword
+				].map(ts.factory.createKeywordTypeNode)
+			) 
+			: ts.factory.createTypeAliasDeclaration(
+				[],
+				[],
+				undefined,
+				undefined,
+				ts.factory.createTypeLiteralNode(properties)
+			).type;
 	}
 	public resolveMixedType(object: IProperty<PropertyType[]>) {
 		let types = [...new Set(object.type)]; // distinct array

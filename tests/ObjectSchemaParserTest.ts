@@ -42,13 +42,13 @@ test("should return a primitive interface-based schema", () => {
 		/**
 		*	some description for first entity
 		*/	
-		interface IFstEntity {
+		interface FstEntity {
 			field: number;
 		}
 		/**
 		* some description for second entity
 		*/
-		interface ISndEntity {
+		interface SndEntity {
 			/**
 			* a very important field
 			*/
@@ -91,11 +91,11 @@ describe("objects references test", () => {
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`	
-			interface IFstEntity {
+			interface FstEntity {
 				field: number;
 			}
-			interface ISndEntity {
-				refArray: IFstEntity[];
+			interface SndEntity {
+				refArray: FstEntity[];
 			}
 		`.replace(/\s/g, ""));
 	});
@@ -179,18 +179,18 @@ describe("objects references test", () => {
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`	
-			interface IFstEntity {
+			interface FstEntity {
 				field: number;
 			}
-			interface ISndEntity {
+			interface SndEntity {
 				refArray: IFstEntity[];
 			}
-			interface ISomeEntity {
+			interface SomeEntity {
 				arr: [ISndEntity[], string];
 				obj: ISomeEntity;
 			}
-			interface IEntity {
-				field: (IFstEntity & ISomeEntity) | ISndEntity;
+			interface Entity {
+				field: (FstEntity & SomeEntity) | SndEntity;
 			}
 		`.replace(/\s/g, ""));
 	});
