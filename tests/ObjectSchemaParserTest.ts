@@ -183,11 +183,11 @@ describe("objects references test", () => {
 				field: number;
 			}
 			interface SndEntity {
-				refArray: IFstEntity[];
+				refArray: FstEntity[];
 			}
 			interface SomeEntity {
-				arr: [ISndEntity[], string];
-				obj: ISomeEntity;
+				arr: [SndEntity[], string];
+				obj: SomeEntity;
 			}
 			interface Entity {
 				field: (FstEntity & SomeEntity) | SndEntity;

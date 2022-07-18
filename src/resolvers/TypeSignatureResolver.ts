@@ -47,7 +47,7 @@ export class TypeSignatureResolver {
 	}
 	public resolveReferenceType(object: IReferenceProperty) {
 		let { 2: reference } = object.$ref.match(/^([^#]+)?#\/definitions\/(.+)/);
-		return ts.factory.createIdentifier("I" + toPascalCase(reference));
+		return ts.factory.createIdentifier(toPascalCase(reference));
 	}
 	public resolveUnionType(object: IProperty<any>) {
 		if (object.hasOwnProperty("allOf"))
