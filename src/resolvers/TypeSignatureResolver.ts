@@ -81,7 +81,9 @@ export class TypeSignatureResolver {
 			? ts.factory.createUnionTypeNode(
 				enumMembers.map(mbr => ts.factory.createLiteralTypeNode(mbr))
 			)
-			: this.resolvePrimitiveType(object);
+			: ts.factory.createKeywordTypeNode(
+				this.resolvePrimitiveType(object)
+			);
 	}
 	public resolveArrayType(object: IArrayProperty) {
 		if (object.prefixItems?.length) {

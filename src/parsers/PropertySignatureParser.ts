@@ -27,9 +27,6 @@ export class PropertySignatureParser {
 				optinalKeyword,
 				this.typeSignatureResolver.resolve(object)
 			);
-
-			if (prop.type === undefined)
-				console.log(objectId);
 			
 			return this.metadataResolver?.resolve(prop, object) ?? prop;
 		} catch (err) {
