@@ -16,7 +16,7 @@ export class ObjectSchemaParser implements ISchemaParser<ISchema> {
 			let object = body?.type === "object"
 				? ts.factory.createInterfaceDeclaration(
 					undefined,
-					undefined,
+					[ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
 					toPascalCase(name),
 					undefined,
 					undefined,
@@ -25,7 +25,13 @@ export class ObjectSchemaParser implements ISchemaParser<ISchema> {
 						: [prop]
 					)
 				)
-				: ts.factory.createTypeAliasDeclaration([], [], toPascalCase(name), undefined, prop.type);
+				: ts.factory.createTypeAliasDeclaration(
+					[], 
+					[ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], 
+					toPascalCase(name), 
+					undefined, 
+					prop.type
+				);
 
 			objects.push(
 				this.metadataResolver?.resolve(object, body) ?? object

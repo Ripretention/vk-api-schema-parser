@@ -99,9 +99,13 @@ export class TypeSignatureResolver {
 		let properties = [];
 
 		for (let [propertyName, property] of Object.entries(object?.properties ?? {})) {
+			let normalizedPropertyName = /^[^a-z_#]/i.test(propertyName)
+				? `"${propertyName}"`
+				: propertyName;
+
 			let propSignature = ts.factory.createPropertySignature(
 				[],
-				ts.factory.createIdentifier(propertyName),
+				ts.factory.createIdentifier(normalizedPropertyName),
 				undefined,
 				this.resolve(property)
 			);

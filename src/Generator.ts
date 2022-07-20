@@ -27,6 +27,10 @@ export class Generator {
 			outputSourceFile
 		);
 		
-		return writeFile(output, result);
+		return writeFile(
+			output, 
+			"/* eslint-disable */\n" + 
+			result
+		);
 	}
 }

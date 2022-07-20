@@ -8,6 +8,7 @@ const generator = new Generator();
 	console.log("⇩ downloading raw objects schema...");
 	await schemaDownloader.download("objects.json");
 	console.log("✔ object schema has been downloaded");
+	
 	console.log("⟳ generating objects schema...");
 	await generator.generate(
 		"Objects.ts", 
