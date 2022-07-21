@@ -1,16 +1,15 @@
+import { IMetadata } from "./IMetadata";
 import { PropertyType } from "./PropertyType";
 
-export interface IProperty<T extends PropertyType> {
+export interface IProperty<T extends PropertyType> extends IMetadata {
 	type: T;
 	const?: T;
-	description?: string;
 	allOf?: IProperty<any>[];
 	oneOf?: IProperty<any>[];
 	anyOf?: IProperty<any>[];
 }
 export interface IReferenceProperty extends IProperty<any> {
 	$ref: string;
-	description?: string;
 }
 export interface IEnumProperty<T extends PropertyType> extends IProperty<T> {
 	enum: any[];
