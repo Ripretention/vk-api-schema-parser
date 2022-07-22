@@ -157,14 +157,16 @@ describe("object property test", () => {
 		let tupleProperty: IObjectProperty = {
 			type: "object",
 			properties: {
-				"prop1": {
-					type: "string"
+				prop1: {
+					type: "string",
+					required: true
 				},
-				"prop2": {
-					"type": "number"
+				prop2: {
+					type: "number",
+					required: false
 				},
-				"prop3": {
-					"type": "boolean"
+				prop3: {
+					type: "boolean"
 				}
 			}
 		};
@@ -178,8 +180,8 @@ describe("object property test", () => {
 		expect(result.replace(/\s/g, "")).toBe(`
 			object: {
 				prop1: string;
-				prop2: number;
-				prop3: boolean;
+				prop2?: number;
+				prop3?: boolean;
 			};
 		`.replace(/\s/g, ""));
 	});
@@ -188,7 +190,7 @@ describe("object property test", () => {
 		let tupleProperty: IObjectProperty = {
 			type: "object",
 			properties: {
-				"tupleProp": {
+				tupleProp: {
 					type: "array",
 					prefixItems: [
 						{
@@ -199,7 +201,7 @@ describe("object property test", () => {
 						}
 					]
 				},
-				"enumProp": {
+				enumProp: {
 					type: "string",
 					enum: [
 						"long",
@@ -208,19 +210,19 @@ describe("object property test", () => {
 						"sky"
 					]
 				},
-				"arrayProp": {
+				arrayProp: {
 					type: "array",
 					items: {
 						type: "boolean"
 					}
 				},
-				"mixedProp": {
+				mixedProp: {
 					type: ["number", "string", "boolean"]
 				},
-				"objectProp": {
+				objectProp: {
 					type: "object",
 					properties: {
-						"field": {
+						field: {
 							type: "array",
 							items: {
 								type: ["number", "string"]
@@ -229,7 +231,8 @@ describe("object property test", () => {
 						}
 					}
 				}
-			}
+			},
+			required: ["enumProp", "mixedProp"]
 		};
 
 		const result = printer.printNode(
@@ -240,15 +243,15 @@ describe("object property test", () => {
 
 		expect(result.replace(/\s/g, "")).toBe(`
 			object: {
-				tupleProp: [string, number];
+				tupleProp?: [string, number];
 				enumProp: "long" | "big" | "clear" | "sky";
-				arrayProp: boolean[];
+				arrayProp?: boolean[];
 				mixedProp: number | string | boolean;
-				objectProp: {
+				objectProp?: {
 					/**
 					* what is it!?
 					*/
-					field: (number | string)[];
+					field?: (number | string)[];
 				};
 			};
 		`.replace(/\s/g, ""));
@@ -348,8 +351,8 @@ describe("union property test", () => {
 				string[] & 
 				[boolean, number | string] & 
 				{ 
-					fF: string; 
-					sF: number; 
+					fF?: string; 
+					sF?: number; 
 				};
 		`.replace(/\s/g, ""));
 	});
@@ -360,7 +363,7 @@ describe("union property test", () => {
 				{
 					type: "object",
 					properties: {
-						"f": {
+						f: {
 							type: "string",
 							description: "some field"
 						}
@@ -387,7 +390,7 @@ describe("union property test", () => {
 				/**
 				* some field
 				*/
-				f: string;
+				f?: string;
 			} | ("qwe" | 321);
 		`.replace(/\s/g, ""));
 	});

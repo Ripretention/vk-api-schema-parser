@@ -5,7 +5,8 @@
 	"testMatch": ["<rootDir>/tests/**"],
 	"globals": {
 		"ts-jest": {
-			"useESM": true
+			"useESM": true,
+			"isolatedModules": true
 		}
 	}
 }

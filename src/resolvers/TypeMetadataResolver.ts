@@ -24,7 +24,7 @@ export class TypeMetadataResolver {
 		
 		metadata = metadata.filter(m => m != null);
 		return metadata.length
-			? "*\n" + metadata.map(str => "* " + str).join("\n")
+			? "*\n" + metadata.map(str => " * " + str).join("\n") + "\n "
 			: null;
 	}
 

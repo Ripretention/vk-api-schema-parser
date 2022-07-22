@@ -106,7 +106,10 @@ export class TypeSignatureResolver {
 			let propSignature = ts.factory.createPropertySignature(
 				[],
 				ts.factory.createIdentifier(normalizedPropertyName),
-				undefined,
+				(property?.required || (Array.isArray(object?.required) && object.required.includes(propertyName))
+					? undefined
+					: ts.factory.createToken(ts.SyntaxKind.QuestionToken)
+				),
 				this.resolve(property)
 			);
 

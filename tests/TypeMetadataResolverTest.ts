@@ -3,6 +3,7 @@ import { IArrayMetadata, IMetadata, INumericMetadata, IObjectMetadata, IStringMe
 
 const metadataResolver = new TypeMetadataResolver();
 describe("basic metadata", () => {
+	let normalize = (str: string) => `*\n * ${str}\n `;
 	test("empty metadata test", () => {
 		let metadata = {};
 
@@ -17,7 +18,7 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Some desc");
+		expect(result).toBe(normalize("Some desc"));
 	});
 	test("numeric metadata test", () => {
 		let metadata: INumericMetadata = {
@@ -27,7 +28,7 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Range: [0; 100]");
+		expect(result).toBe(normalize("Range: [0; 100]"));
 	});
 	test("numeric metadata test with exclusive range", () => {
 		let metadata: INumericMetadata = {
@@ -39,7 +40,7 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Range: (0; 100)");
+		expect(result).toBe(normalize("Range: (0; 100)"));
 	});
 	test("string metadata test (range)", () => {
 		let metadata: IStringMetadata = {
@@ -49,7 +50,7 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Length: [4; 32]");
+		expect(result).toBe(normalize("Length: [4; 32]"));
 	});
 	test("string metadata test (format)", () => {
 		let metadata: IStringMetadata = {
@@ -58,7 +59,7 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Format: uri");
+		expect(result).toBe(normalize("Format: uri"));
 	});
 	test("object metadata test", () => {
 		let metadata: IObjectMetadata = {
@@ -67,7 +68,7 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Minimum properties count: 43");
+		expect(result).toBe(normalize("Minimum properties count: 43"));
 	});
 	test("array metadata test", () => {
 		let metadata: IArrayMetadata = {
@@ -76,6 +77,6 @@ describe("basic metadata", () => {
 
 		let result = metadataResolver.constructMetadata(metadata);
 
-		expect(result).toBe("*\n* Maximum array length: 34");
+		expect(result).toBe(normalize("Maximum array length: 34"));
 	});
 });

@@ -20,8 +20,8 @@ export interface IArrayProperty extends IProperty<"array"> {
 }
 export interface IObjectProperty extends IProperty<"object"> {
 	properties: {
-		[key: string]: IArrayProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
+		[key: string]: IObjectProperty | (IArrayProperty | IEnumProperty<any> | IProperty<any>) & { required?: boolean; };
 	};
-	required?: string[];
+	required?: (keyof this["properties"])[];
 	additionalProperties?: boolean;
 }

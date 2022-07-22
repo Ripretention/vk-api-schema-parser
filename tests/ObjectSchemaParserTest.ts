@@ -43,7 +43,7 @@ test("should return a primitive interface-based schema", () => {
 		*	some description for first entity
 		*/	
 		export interface FstEntity {
-			field: number;
+			field?: number;
 		}
 		/**
 		* some description for second entity
@@ -52,7 +52,7 @@ test("should return a primitive interface-based schema", () => {
 			/**
 			* a very important field
 			*/
-			field: string;
+			field?: string;
 		}
 	`.replace(/\s/g, ""));
 });
@@ -92,10 +92,10 @@ describe("objects references test", () => {
 	
 		expect(result.replace(/\s/g, "")).toBe(`	
 			export interface FstEntity {
-				field: number;
+				field?: number;
 			}
 			export interface SndEntity {
-				refArray: FstEntity[];
+				refArray?: FstEntity[];
 			}
 		`.replace(/\s/g, ""));
 	});
@@ -180,17 +180,17 @@ describe("objects references test", () => {
 	
 		expect(result.replace(/\s/g, "")).toBe(`	
 			export interface FstEntity {
-				field: number;
+				field?: number;
 			}
 			export interface SndEntity {
-				refArray: FstEntity[];
+				refArray?: FstEntity[];
 			}
 			export interface SomeEntity {
-				arr: [SndEntity[], string];
-				obj: SomeEntity;
+				arr?: [SndEntity[], string];
+				obj?: SomeEntity;
 			}
 			export interface Entity {
-				field: (FstEntity & SomeEntity) | SndEntity;
+				field?: (FstEntity & SomeEntity) | SndEntity;
 			}
 		`.replace(/\s/g, ""));
 	});
