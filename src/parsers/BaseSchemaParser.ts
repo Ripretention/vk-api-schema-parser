@@ -16,8 +16,8 @@ export abstract class BaseSchemaParser<TSchema extends ISchema> {
 			[],
 			ts.factory.createImportClause(
 				false,
-				namespace.id,
-				undefined
+				undefined,
+				ts.factory.createNamespaceImport(namespace.id)
 			),
 			ts.factory.createStringLiteral(namespace.path.replace(".ts", ""))
 		));
