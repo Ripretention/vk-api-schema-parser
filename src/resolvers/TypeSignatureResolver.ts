@@ -3,14 +3,15 @@ import { PropertyType } from "../types/jsonschema/PropertyType";
 import type { TypeMetadataResolver } from "./TypeMetadataResolver";
 import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty, IReferenceProperty } from "../types/jsonschema/IProperty";
 import { toPascalCase } from "../Utils";
+import { INamespace } from "../types/INamespace";
 
 type SupportedTypes = IArrayProperty | IReferenceProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
 export class TypeSignatureResolver {
 	constructor(private readonly metadataResolver: TypeMetadataResolver = null) {}
 	
-	public resolve(object: SupportedTypes) {
+	public resolve(object: SupportedTypes, namespaces?: INamespace[]) {
 		if (this.isReferenceType(object))
-			return this.resolveReferenceType(object);
+			return this.resolveReferenceType(object, namespaces);
 		if (this.isUnionType(object))
 			return this.resolveUnionType(object);
 		if (this.isEnumType(object))
@@ -45,9 +46,16 @@ export class TypeSignatureResolver {
 	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
 	}
-	public resolveReferenceType(object: IReferenceProperty) {
-		let { 2: reference } = object.$ref.match(/^([^#]+)?#\/definitions\/(.+)/);
-		return ts.factory.createIdentifier(toPascalCase(reference));
+	public resolveReferenceType(object: IReferenceProperty, namespaces?: INamespace[]) {
+		let { 1: namespaceLabel, 2: reference } = object.$ref.match(/^(?:([^#]+).json)?#\/definitions\/(.+)/);
+		let referenceIdentifier = ts.factory.createIdentifier(toPascalCase(reference));
+
+		return namespaces?.length
+			? ts.factory.createQualifiedName(
+				namespaces.find(n => n.label === namespaceLabel).id,
+				referenceIdentifier
+			)
+			: referenceIdentifier;
 	}
 	public resolveUnionType(object: IProperty<any>) {
 		if (object.hasOwnProperty("allOf"))

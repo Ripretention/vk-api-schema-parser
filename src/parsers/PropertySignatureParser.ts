@@ -2,9 +2,13 @@ import * as ts from "typescript";
 import { IProperty } from "../types/jsonschema/IProperty";
 import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
 import { TypeSignatureResolver } from "../resolvers/TypeSignatureResolver";
+import { INamespace } from "../types/INamespace";
 
 export class PropertySignatureParser {
-	constructor(private readonly metadataResolver: TypeMetadataResolver = new TypeMetadataResolver()) {}
+	constructor(
+		private readonly metadataResolver: TypeMetadataResolver = new TypeMetadataResolver(),
+		private readonly namespaces?: INamespace[]
+	) {}
 	private readonly typeSignatureResolver = new TypeSignatureResolver(this.metadataResolver);
 
 	public parse(
@@ -25,7 +29,7 @@ export class PropertySignatureParser {
 				readonlyKeyword,
 				ts.factory.createIdentifier(objectId),
 				optinalKeyword,
-				this.typeSignatureResolver.resolve(object)
+				this.typeSignatureResolver.resolve(object, this.namespaces)
 			);
 			
 			return this.metadataResolver?.resolve(prop, object) ?? prop;

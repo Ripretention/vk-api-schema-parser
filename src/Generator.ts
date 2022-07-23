@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import { writeFile } from "fs/promises";
 import type { ISchema } from "./types/jsonschema/ISchema";
-import type { ISchemaParser } from "./types/ISchemaParser";
+import type { BaseSchemaParser } from "./parsers/BaseSchemaParser";
 
 export class Generator {
 	constructor(
@@ -10,7 +10,7 @@ export class Generator {
 	public generate(
 		output: string,
 		schema: ISchema,
-		parser: ISchemaParser<any>
+		parser: BaseSchemaParser<any>
 	) {
 		let outputSourceFile = ts.createSourceFile(
 			output, 

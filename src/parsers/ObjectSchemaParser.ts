@@ -1,14 +1,9 @@
 import * as ts from "typescript";
-import { ISchema } from "../types/jsonschema/ISchema";
-import { ISchemaParser } from "../types/ISchemaParser";
-import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
-import { PropertySignatureParser } from "./PropertySignatureParser";
 import { toPascalCase } from "../Utils";
+import { ISchema } from "../types/jsonschema/ISchema";
+import { BaseSchemaParser } from "./BaseSchemaParser";
 
-export class ObjectSchemaParser implements ISchemaParser<ISchema> {
-	constructor(private readonly metadataResolver: TypeMetadataResolver = new TypeMetadataResolver()) {}
-	private readonly propSignatureParser = new PropertySignatureParser(this.metadataResolver);
-
+export class ObjectSchemaParser extends BaseSchemaParser<ISchema> {
 	public parse(schema: ISchema) {
 		let objects = [];
 		for (let [name, body] of Object.entries(schema.definitions)) {
