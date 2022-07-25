@@ -4,9 +4,9 @@ import { INamespace } from "./src/types/INamespace";
 import { SchemaDownloader } from "./src/SchemaDownloader";
 import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
 import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParsers";
+import { ErrorSchemaParser } from "./src/parsers/ErrorSignatureParser";
 
 const generator = new Generator();
-const schemaDownloader = new SchemaDownloader("objects");
 (async () => {
 	await downloadSchema("objects");
 	console.log("⟳ generating objects schema...");
@@ -20,6 +20,14 @@ const schemaDownloader = new SchemaDownloader("objects");
 		label: "objects",
 		path: "./Objects.ts"
 	};
+
+	await downloadSchema("errors");
+	console.log("⟳ generating errors schema...");
+	await generator.generate(
+		"Errors.ts", 
+		require("../errors.json"), 
+		new ErrorSchemaParser()
+	);
 
 	await downloadSchema("responses");
 	console.log("⟳ generating responses schema...");
@@ -37,6 +45,7 @@ const schemaDownloader = new SchemaDownloader("objects");
 });
 
 async function downloadSchema(name) {
+	let schemaDownloader = new SchemaDownloader(name);
 	console.log(`⇩ downloading raw ${name} schema...`);
 	await schemaDownloader.download(`${name}.json`);
 	console.log(`✔ ${name} schema has been downloaded`);

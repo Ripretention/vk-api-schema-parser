@@ -1,12 +1,12 @@
 import * as ts from "typescript";
-import { ISchema } from "../src/types/jsonschema/ISchema";
-import { IObjectProperty, IReferenceProperty } from "../src/types/jsonschema/IProperty";
+import { IPropertySchema } from "../src/types/jsonschema/ISchema";
 import { ObjectSchemaParser } from "../src/parsers/ObjectSchemaParser";
+import { IObjectProperty, IReferenceProperty } from "../src/types/jsonschema/IProperty";
 
 const objectSchemaParser = new ObjectSchemaParser();
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 test("should return a primitive interface-based schema", () => {
-	let schema: ISchema = {
+	let schema: IPropertySchema = {
 		$schema: "https://json.com",
 		title: "obj",
 		definitions: {
@@ -58,7 +58,7 @@ test("should return a primitive interface-based schema", () => {
 });
 describe("objects references test", () => {
 	test("should return schema with a references", () => {
-		let schema: ISchema = {
+		let schema: IPropertySchema = {
 			$schema: "https://json.com",
 			title: "obj",
 			definitions: {
@@ -100,7 +100,7 @@ describe("objects references test", () => {
 		`.replace(/\s/g, ""));
 	});
 	test("should return schema with a complex references", () => {
-		let schema: ISchema = {
+		let schema: IPropertySchema = {
 			$schema: "https://json.com",
 			title: "obj",
 			definitions: {

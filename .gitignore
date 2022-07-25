@@ -3,3 +3,4 @@ node_modules
 *.json
 Objects.ts
 Responses.ts
+Errors.ts

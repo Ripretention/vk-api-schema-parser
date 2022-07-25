@@ -1,10 +1,10 @@
 import * as ts from "typescript";
-import { ISchema } from "../types/jsonschema/ISchema";
 import { toPascalCase } from "../Utils";
 import { BaseSchemaParser } from "./BaseSchemaParser";
+import { IPropertySchema } from "../types/jsonschema/ISchema";
 
-export class ResponseObjectParser extends BaseSchemaParser<ISchema> {
-	public parse(schema: ISchema) {
+export class ResponseObjectParser extends BaseSchemaParser<IPropertySchema> {
+	public parse(schema: IPropertySchema) {
 		let responses = [];
 		for (let [name, body] of Object.entries(schema.definitions)) {
 			let prop = this.propSignatureParser.parse(name, body);

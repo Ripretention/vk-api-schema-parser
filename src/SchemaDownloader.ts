@@ -16,11 +16,11 @@ export class SchemaDownloader {
 				hostname: "raw.githubusercontent.com",
 				path: `VKCOM/vk-api-schema/${threadLabel}/${this.schemaTitle}.json`,
 				agent: new Agent({ keepAlive: true }),
+				timeout: 3e6,
 				...(optinos ?? {})
 			}, res => {
 				res.pipe(outputStream);
-				res.on("end", () => {
-					outputStream.close();
+				outputStream.on("close", () => {
 					resolve(undefined);
 				});
 			});
