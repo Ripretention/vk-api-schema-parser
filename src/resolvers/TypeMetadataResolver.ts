@@ -14,17 +14,17 @@ export class TypeMetadataResolver {
 			: node;
 	}
 	public constructMetadata(object: IMetadata): string | null {
-		let metadata = [];
-		metadata.push(object?.description);
-		metadata.push(this.consctuctStringFormat(object));
-		metadata.push(this.constructNumericRange(object));
-		metadata.push(this.constructArrayLengthRange(object));
-		metadata.push(this.constructStringLengthRange(object));
-		metadata.push(this.constructObjectPropertiesCountRange(object));
+		let metadata = [
+			object?.description,
+			this.consctuctStringFormat(object),
+			this.constructNumericRange(object),
+			this.constructArrayLengthRange(object),
+			this.constructStringLengthRange(object),
+			this.constructObjectPropertiesCountRange(object)
+		].filter(m => m != null);
 		
-		metadata = metadata.filter(m => m != null);
 		return metadata.length
-			? "*\n" + metadata.map(str => " * " + str).join("\n") + "\n "
+			? "*\n" + metadata.map(str => " * " + str).join("\n\n") + "\n "
 			: null;
 	}
 

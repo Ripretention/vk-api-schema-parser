@@ -7,11 +7,14 @@ import { INamespace } from "../types/INamespace";
 
 type SupportedTypes = IArrayProperty | IReferenceProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
 export class TypeSignatureResolver {
-	constructor(private readonly metadataResolver: TypeMetadataResolver = null) {}
+	constructor(
+		private readonly metadataResolver: TypeMetadataResolver = null,
+		private readonly namespaces: INamespace[]
+	) {}
 	
-	public resolve(object: SupportedTypes, namespaces?: INamespace[]) {
+	public resolve(object: SupportedTypes) {
 		if (this.isReferenceType(object))
-			return this.resolveReferenceType(object, namespaces);
+			return this.resolveReferenceType(object);
 		if (this.isUnionType(object))
 			return this.resolveUnionType(object);
 		if (this.isEnumType(object))
@@ -23,7 +26,9 @@ export class TypeSignatureResolver {
 		if (this.isMixedType(object))
 			return this.resolveMixedType(object);
 
-		return ts.factory.createKeywordTypeNode(this.resolvePrimitiveType(object));
+		return ts.factory.createKeywordTypeNode(
+			this.resolvePrimitiveType(object)
+		);
 	}
 
 	private isReferenceType(object: SupportedTypes): object is IReferenceProperty {
@@ -46,20 +51,23 @@ export class TypeSignatureResolver {
 	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
 	}
-	public resolveReferenceType(object: IReferenceProperty, namespaces?: INamespace[]) {
+
+	public resolveReferenceType(object: IReferenceProperty) {
 		let { 1: namespaceLabel, 2: reference } = object.$ref.match(/^(?:([^#]+).json)?#\/definitions\/(.+)/);
 		let referenceIdentifier = ts.factory.createIdentifier(toPascalCase(reference));
 
-		return namespaces?.length
+		return this.namespaces?.length
 			? ts.factory.createQualifiedName(
-				namespaces.find(n => n.label === namespaceLabel).id,
+				this.namespaces.find(n => n.label === namespaceLabel).id,
 				referenceIdentifier
 			)
 			: referenceIdentifier;
 	}
 	public resolveUnionType(object: IProperty<any>) {
 		if (object.hasOwnProperty("allOf"))
-			return ts.factory.createIntersectionTypeNode(object.allOf.map(this.resolve.bind(this)));
+			return ts.factory.createIntersectionTypeNode(
+				object.allOf.map(this.resolve.bind(this))
+			);
 		else if (object.hasOwnProperty("anyOf") || object.hasOwnProperty("oneOf"))
 			return ts.factory.createUnionTypeNode(
 				object[object.hasOwnProperty("anyOf") ? "anyOf" : "oneOf"].map(this.resolve.bind(this))

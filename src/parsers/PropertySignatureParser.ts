@@ -9,7 +9,7 @@ export class PropertySignatureParser {
 		private readonly metadataResolver: TypeMetadataResolver = new TypeMetadataResolver(),
 		private readonly namespaces?: INamespace[]
 	) {}
-	private readonly typeSignatureResolver = new TypeSignatureResolver(this.metadataResolver);
+	private readonly typeSignatureResolver = new TypeSignatureResolver(this.metadataResolver, this.namespaces);
 
 	public parse(
 		objectId: string, 
@@ -29,7 +29,7 @@ export class PropertySignatureParser {
 				readonlyKeyword,
 				ts.factory.createIdentifier(objectId),
 				optinalKeyword,
-				this.typeSignatureResolver.resolve(object, this.namespaces)
+				this.typeSignatureResolver.resolve(object)
 			);
 			
 			return this.metadataResolver?.resolve(prop, object) ?? prop;
