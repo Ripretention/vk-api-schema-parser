@@ -9,11 +9,13 @@ test("should return a subcodes schema", () => {
 		$schema: "",
 		title: "",
 		definitions: {
-			some_subcode: {
-				subcode: 213
-			},
-			some_subcode2: {
-				subcode: 43
+			subcodes: {
+				some_subcode: {
+					subcode: 213
+				},
+				some_subcode2: {
+					subcode: 43
+				}
 			}
 		}, 
 		errors: {}
@@ -34,7 +36,9 @@ test("should return a error schema", () => {
 	let schema: IErrorSchema = {
 		$schema: "",
 		title: "",
-		definitions: {}, 
+		definitions: {
+			subcodes: {}
+		}, 
 		errors: {
 			some_error: {
 				code: 1,
@@ -71,11 +75,13 @@ test("should return a error with subcodes schema", () => {
 		$schema: "",
 		title: "",
 		definitions: {
-			some_subcode: {
-				subcode: 32
-			},
-			some_subcode2: {
-				subcode: 64
+			subcodes: {
+				some_subcode: {
+					subcode: 32
+				},
+				some_subcode2: {
+					subcode: 64
+				}
 			}
 		}, 
 		errors: {

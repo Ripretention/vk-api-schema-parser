@@ -61,7 +61,7 @@ export class ErrorSignatureResolver {
 		if (typeof code === "number")
 			return ts.factory.createLiteralTypeNode(ts.factory.createNumericLiteral(code));
 		else if (code?.$ref)
-			return ts.factory.createIdentifier(toPascalCase(code.$ref.match(/#\/definitions\/(.+)/i)[1]));
+			return ts.factory.createIdentifier(toPascalCase(code.$ref.match(/#\/definitions\/(?:subcodes\/)?(.+)/i)[1]));
 
 		return ts.factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
 	}

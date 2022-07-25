@@ -14,7 +14,9 @@ export interface IPropertySchema extends ISchema {
 
 export interface IErrorSchema extends ISchema {
 	definitions: {
-        [subcodeField: string]: ISubcode;
+        subcodes: {
+			[subcodeField: string]: ISubcode
+		};
     };
     errors: {
         [error: string]: IError;

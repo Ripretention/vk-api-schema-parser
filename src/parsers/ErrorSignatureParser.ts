@@ -11,7 +11,7 @@ export class ErrorSchemaParser extends BaseSchemaParser<IErrorSchema> {
 		let errors = [];
 		let definitions = [];
 
-		for (let [name, body] of Object.entries(schema.definitions))
+		for (let [name, body] of Object.entries(schema.definitions.subcodes))
 			definitions.push(
 				ts.factory.createTypeAliasDeclaration(
 					[], 
