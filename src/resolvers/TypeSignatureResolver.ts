@@ -5,14 +5,13 @@ import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty, IReferencePr
 import { toPascalCase } from "../Utils";
 import { INamespace } from "../types/INamespace";
 
-type SupportedTypes = IArrayProperty | IReferenceProperty | IObjectProperty | IEnumProperty<any> | IProperty<any>;
 export class TypeSignatureResolver {
 	constructor(
 		private readonly metadataResolver: TypeMetadataResolver = null,
 		private readonly namespaces: INamespace[]
 	) {}
 	
-	public resolve(object: SupportedTypes) {
+	public resolve(object: IProperty<any>) {
 		if (this.isReferenceType(object))
 			return this.resolveReferenceType(object);
 		if (this.isUnionType(object))
@@ -31,24 +30,24 @@ export class TypeSignatureResolver {
 		);
 	}
 
-	private isReferenceType(object: SupportedTypes): object is IReferenceProperty {
+	private isReferenceType(object: IProperty<any>): object is IReferenceProperty {
 		return (object as IReferenceProperty)?.$ref !== undefined;
 	}
-	private isUnionType(object: SupportedTypes): object is IProperty<any> {
+	private isUnionType(object: IProperty<any>): object is IProperty<any> {
 		return ["anyOf", "oneOf", "allOf"]
 			.map(p => object?.[p]?.length ?? 0)
 			.find(p => p > 0) !== undefined;
 	}
-	private isEnumType(object: SupportedTypes): object is IEnumProperty<any> {
+	private isEnumType(object: IProperty<any>): object is IEnumProperty<any> {
 		return ((object as IEnumProperty<any>)?.enum?.length ?? 0) > 0;
 	}
-	private isArrayType(object: SupportedTypes): object is IArrayProperty {
+	private isArrayType(object: IProperty<any>): object is IArrayProperty {
 		return object?.type === "array" || (object as IArrayProperty)?.items !== undefined;
 	}
-	private isObjectType(object: SupportedTypes): object is IObjectProperty {
+	private isObjectType(object: IProperty<any>): object is IObjectProperty {
 		return object?.type === "object" || ((object as IObjectProperty)?.properties?.length ?? 0) > 0;
 	}
-	private isMixedType(object: SupportedTypes): object is IProperty<PropertyType[]> {
+	private isMixedType(object: IProperty<any>): object is IProperty<PropertyType[]> {
 		return object?.type && Array.isArray(object.type);
 	}
 
