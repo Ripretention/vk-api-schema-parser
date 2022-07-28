@@ -1,11 +1,10 @@
 import * as ts from "typescript";
-import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
-import { TypeSignatureResolver } from "../resolvers/TypeSignatureResolver";
-import { INamespace } from "../types/INamespace";
-import { IMetadata } from "../types/jsonschema/IMetadata";
-import { IMethod } from "../types/jsonschema/IMethod";
-import { IProperty } from "../types/jsonschema/IProperty";
+import { INamespace } from "../../types/INamespace";
+import { IMethod } from "../../types/jsonschema/IMethod";
+import { IProperty } from "../../types/jsonschema/IProperty";
 import { PropertySignatureParser } from "./PropertySignatureParser";
+import { TypeMetadataResolver } from "../../resolvers/TypeMetadataResolver";
+import { TypeSignatureResolver } from "../../resolvers/TypeSignatureResolver";
 
 export class MethodSignatureParser {
 	constructor(
@@ -19,13 +18,14 @@ export class MethodSignatureParser {
 		methodName: string, 
 		method: IMethod
 	) {
-		let fn = ts.factory.createFunctionDeclaration(
+		let methodFn = ts.factory.createMethodDeclaration(
 			[],
 			[
 				ts.factory.createModifier(ts.SyntaxKind.PublicKeyword)
 			],
 			undefined,
 			methodName,
+			undefined,
 			[],
 			[
 				ts.factory.createParameterDeclaration(
@@ -44,7 +44,7 @@ export class MethodSignatureParser {
 			undefined
 		);
 
-		return this.metadataResolver?.resolve(fn, method) ?? fn;
+		return this.metadataResolver?.resolve(methodFn, method) ?? methodFn;
 	}
 
 	private parseParameters(method: IMethod) {

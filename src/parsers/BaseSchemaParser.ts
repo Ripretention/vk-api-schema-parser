@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { ISchema } from "../types/jsonschema/ISchema";
-import { PropertySignatureParser } from "./PropertySignatureParser";
+import { PropertySignatureParser } from "./components/PropertySignatureParser";
 import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
 import { INamespace } from "../types/INamespace";
 

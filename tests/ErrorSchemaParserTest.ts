@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { IErrorSchema } from "../src/types/jsonschema/ISchema";
-import { ErrorSchemaParser } from "../src/parsers/ErrorSignatureParser";
+import { ErrorSchemaParser } from "../src/parsers/ErrorSchemaParser";
 
 const errorSchemaParser = new ErrorSchemaParser();
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });

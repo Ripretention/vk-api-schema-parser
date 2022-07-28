@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { PropertyType } from "../src/types/jsonschema/PropertyType";
-import { PropertySignatureParser } from "../src/parsers/PropertySignatureParser";
+import { PropertySignatureParser } from "../src/parsers/components/PropertySignatureParser";
 import { TypeMetadataResolver } from "../src/resolvers/TypeMetadataResolver";
 import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../src/types/jsonschema/IProperty";
 

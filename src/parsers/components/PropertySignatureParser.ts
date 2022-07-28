@@ -1,8 +1,8 @@
 import * as ts from "typescript";
-import { IProperty } from "../types/jsonschema/IProperty";
-import { TypeMetadataResolver } from "../resolvers/TypeMetadataResolver";
-import { TypeSignatureResolver } from "../resolvers/TypeSignatureResolver";
-import { INamespace } from "../types/INamespace";
+import { IProperty } from "../../types/jsonschema/IProperty";
+import { TypeMetadataResolver } from "../../resolvers/TypeMetadataResolver";
+import { TypeSignatureResolver } from "../../resolvers/TypeSignatureResolver";
+import { INamespace } from "../../types/INamespace";
 
 export class PropertySignatureParser {
 	constructor(

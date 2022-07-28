@@ -1,5 +1,5 @@
 import { IError } from "./IError";
-import { IMetadata, IObjectMetadata } from "./IMetadata";
+import { IMetadata } from "./IMetadata";
 import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty, IReferenceProperty } from "./IProperty";
 
 export interface IMethod extends IMetadata {

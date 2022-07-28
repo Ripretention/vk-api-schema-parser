@@ -3,8 +3,8 @@ import { Generator } from "./src/Generator";
 import { INamespace } from "./src/types/INamespace";
 import { SchemaDownloader } from "./src/SchemaDownloader";
 import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
-import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParsers";
-import { ErrorSchemaParser } from "./src/parsers/ErrorSignatureParser";
+import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParser";
+import { ErrorSchemaParser } from "./src/parsers/ErrorSchemaParser";
 
 const generator = new Generator();
 (async () => {

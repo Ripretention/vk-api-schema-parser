@@ -1,4 +1,5 @@
 import { IError, ISubcode } from "./IError";
+import { IMethod } from "./IMethod";
 import { IProperty } from "./IProperty";
 
 export interface ISchema {
@@ -21,4 +22,10 @@ export interface IErrorSchema extends ISchema {
     errors: {
         [error: string]: IError;
     };
+}
+
+export interface IMethodSchema extends ISchema {
+	methods: IMethod[];
+	termsOfService?: string;
+	version?: `${number}.${number}`;
 }

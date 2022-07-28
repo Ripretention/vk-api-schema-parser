@@ -1,13 +1,11 @@
 import * as ts from "typescript";
 import { IMethod } from "../src/types/jsonschema/IMethod";
-import { MethodSignatureParser } from "../src/parsers/MethodSignatureParser";
-import { INumericMetadata } from "../src/types/jsonschema/IMetadata";
-import { IEnumProperty } from "../src/types/jsonschema/IProperty";
+import { MethodSignatureParser } from "../src/parsers/components/MethodSignatureParser";
 
 const parser = new MethodSignatureParser();
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
-test("should return a function with basic arguments and a primitive result", () => {
+test("should return a method with basic arguments and a primitive result", () => {
 	let method: IMethod = {
 		name: "some.name",
 		parameters: [
@@ -34,13 +32,13 @@ test("should return a function with basic arguments and a primitive result", () 
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
-		public function fn(params: {
+		public fn(params: {
 			some_int: number;
 			some_string: string;
 		}): number;
 	`.replace(/\s/g, ""));
 });
-test("should return a function with complex arguments and a complex result", () => {
+test("should return a method with complex arguments and a complex result", () => {
 	let method: IMethod = {
 		name: "users.search",
 		description: "some function",
@@ -119,7 +117,7 @@ test("should return a function with complex arguments and a complex result", () 
 		/**
 		 * some function
 		 */
-		public function fn(params: {
+		public fn(params: {
 			/**
 			 * number of users
 			 */
