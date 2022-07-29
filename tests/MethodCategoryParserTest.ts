@@ -76,14 +76,18 @@ test("should return a users category", () => {
 			}): {
 				first_name?: string;
 				last_name?: string;
-			};
+			} {
+				return this.callMethod("users.get", params as object);
+			}
 
 			public find(params: {
 				first_name: string;
 				last_name: string;
 			}): {
 				user_id?: number;
-			};
+			} {
+				return this.callMethod("users.find", params as object);
+			}
 
 			constructor(private readonly callMethod: (methodName: string, params: object) => any) {}
 		}

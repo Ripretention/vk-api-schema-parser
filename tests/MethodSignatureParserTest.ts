@@ -35,7 +35,9 @@ test("should return a method with basic arguments and a primitive result", () =>
 		public fn(params: {
 			some_int: number;
 			some_string: string;
-		}): number;
+		}): number {
+			return this.callMethod("some.name", params as object);
+		}
 	`.replace(/\s/g, ""));
 });
 test("should return a method with complex arguments and a complex result", () => {
@@ -139,6 +141,8 @@ test("should return a method with complex arguments and a complex result", () =>
 			users?: {
 				name?: string;
 			}[];
-		};
+		} {
+			return this.callMethod("users.search", params as object);
+		}
 	`.replace(/\s/g, ""));
 });

@@ -41,7 +41,23 @@ export class MethodSignatureParser {
 				type: undefined,
 				anyOf: Object.values(method.responses)
 			}),
-			undefined
+			ts.factory.createBlock([
+				ts.factory.createReturnStatement(
+					ts.factory.createCallExpression(
+						ts.factory.createIdentifier("this.callMethod"),
+						[],
+						[
+							ts.factory.createStringLiteral(
+								method.name
+							),
+							ts.factory.createAsExpression(
+								ts.factory.createIdentifier("params"),
+								ts.factory.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword)
+							)
+						]
+					)
+				)
+			])
 		);
 
 		return this.metadataResolver?.resolve(methodFn, method) ?? methodFn;
