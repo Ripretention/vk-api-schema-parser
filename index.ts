@@ -2,9 +2,10 @@ import * as ts from "typescript";
 import { Generator } from "./src/Generator";
 import { INamespace } from "./src/types/INamespace";
 import { SchemaDownloader } from "./src/SchemaDownloader";
-import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
-import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParser";
 import { ErrorSchemaParser } from "./src/parsers/ErrorSchemaParser";
+import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
+import { MethodSchemaParser } from "./src/parsers/MethodSchemaParser";
+import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParser";
 
 const generator = new Generator();
 (async () => {
@@ -28,6 +29,11 @@ const generator = new Generator();
 		require("../errors.json"), 
 		new ErrorSchemaParser()
 	);
+	const errorsNamespace: INamespace = {
+		id: ts.factory.createIdentifier("Errors"),
+		label: "errors",
+		path: "./Errors.ts"
+	};
 
 	await downloadSchema("responses");
 	console.log("⟳ generating responses schema...");
@@ -36,6 +42,23 @@ const generator = new Generator();
 		require("../responses.json"), 
 		new ResponseObjectParser([
 			objectsNamespace
+		])
+	);
+	const responsesNamespace: INamespace = {
+		id: ts.factory.createIdentifier("Responses"),
+		label: "responses",
+		path: "./Responses.ts"
+	};
+
+	await downloadSchema("methods");
+	console.log("⟳ generating methods schema...");
+	await generator.generate(
+		"Methods.ts", 
+		require("../methods.json"), 
+		new MethodSchemaParser([
+			errorsNamespace,
+			objectsNamespace,
+			responsesNamespace
 		])
 	);
 

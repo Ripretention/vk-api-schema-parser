@@ -52,12 +52,12 @@ export class TypeSignatureResolver {
 	}
 
 	public resolveReferenceType(object: IReferenceProperty) {
-		let { 1: namespaceLabel, 2: reference } = object.$ref.match(/^(?:([^#]+).json)?#\/definitions\/(.+)/);
+		let { 1: namespaceLabel, 2: reference } = object.$ref.match(/^(?:([^#]+).json)?#\/(?:error|definitions)\/(.+)/);
 		let referenceIdentifier = ts.factory.createIdentifier(toPascalCase(reference));
 
 		return this.namespaces?.length
 			? ts.factory.createQualifiedName(
-				this.namespaces.find(n => n.label === namespaceLabel).id,
+				this.namespaces.find(n => n.label === namespaceLabel)?.id ?? undefined,
 				referenceIdentifier
 			)
 			: referenceIdentifier;

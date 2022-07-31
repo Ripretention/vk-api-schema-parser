@@ -66,7 +66,7 @@ export class MethodSignatureParser {
 	private parseParameters(method: IMethod) {
 		let properties = [];
 
-		for (let parameter of method.parameters)
+		for (let parameter of method.parameters ?? [])
 			properties.push(
 				this.propertySignatureParser.parse(parameter.name, parameter as IProperty<any>)
 			);

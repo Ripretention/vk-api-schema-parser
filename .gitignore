@@ -4,3 +4,4 @@ node_modules
 Objects.ts
 Responses.ts
 Errors.ts
+Methods.ts
