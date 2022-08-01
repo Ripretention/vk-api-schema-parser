@@ -1,16 +1,22 @@
 import * as ts from "typescript";
+import { unlink } from "fs/promises";
 import { Generator } from "./src/Generator";
-import { INamespace } from "./src/types/INamespace";
+import { toUpperFirstChar } from "./src/Utils";
 import { SchemaDownloader } from "./src/SchemaDownloader";
+import { BaseSchemaParser } from "./src/parsers/BaseSchemaParser";
 import { ErrorSchemaParser } from "./src/parsers/ErrorSchemaParser";
 import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
 import { MethodSchemaParser } from "./src/parsers/MethodSchemaParser";
 import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParser";
-import { toUpperFirstChar } from "./src/Utils";
-import { BaseSchemaParser } from "./src/parsers/BaseSchemaParser";
 
 const generator = new Generator();
 const outputDir = process.argv?.[2] ?? "./vkschema";
+const isAutoCleanUpActivated = process.argv
+	.slice(2, process.argv.length)
+	.some(arg => arg === "-c");
+
+console.log(process.argv
+	.slice(2, process.argv.length));
 
 async function genenrate(schemaName: string, parser: BaseSchemaParser<any>) {
 	let schemaDownloader = new SchemaDownloader(schemaName);
@@ -25,6 +31,9 @@ async function genenrate(schemaName: string, parser: BaseSchemaParser<any>) {
 		parser
 	);
 	
+	if (isAutoCleanUpActivated)
+		await unlink(`${outputDir}/${schemaName}.json`);
+
 	console.log("\n");
 	return {
 		id: ts.factory.createIdentifier(toUpperFirstChar(schemaName)),
