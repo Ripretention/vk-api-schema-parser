@@ -3,6 +3,7 @@ import { INamespace } from "../../types/INamespace";
 import { IMethod } from "../../types/jsonschema/IMethod";
 import { TypeMetadataResolver } from "../../resolvers/TypeMetadataResolver";
 import { MethodSignatureParser } from "./MethodSignatureParser";
+import { toUpperFirstChar } from "../../Utils";
 
 export class MethodCategoryParser {
 	constructor(
@@ -24,7 +25,7 @@ export class MethodCategoryParser {
 		return ts.factory.createClassDeclaration(
 			[],
 			[],
-			this.categoryNameNormalize(categoryName),
+			toUpperFirstChar(categoryName),
 			[],
 			[],
 			properties.concat([
@@ -76,9 +77,5 @@ export class MethodCategoryParser {
 			constructorParams,
 			ts.factory.createBlock([])
 		);
-	}
-
-	private categoryNameNormalize(name: string) {
-		return name[0].toUpperCase() + name.slice(1, name.length);
 	}
 }

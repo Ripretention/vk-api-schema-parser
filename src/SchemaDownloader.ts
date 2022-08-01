@@ -1,14 +1,16 @@
 import { Agent, get, RequestOptions } from "https";
-import { createWriteStream } from "fs";
+import { createWriteStream, existsSync } from "fs";
+import { mkdir } from "fs/promises";
 
 export class SchemaDownloader {
 	constructor(private readonly schemaTitle: string) {}
 
 	public async download(
-		output = this.schemaTitle + ".ts",
+		output = this.schemaTitle + ".json",
 		threadLabel = "master",
 		optinos?: RequestOptions
 	) {
+		await this.createOutputIfNotExist(output);
 		let outputStream = createWriteStream(output);
 
 		return new Promise((resolve, reject) => {
@@ -33,5 +35,12 @@ export class SchemaDownloader {
 
 			req.end();
 		});
+	}
+
+	private async createOutputIfNotExist(output: string) {
+		let dir = output.replace(/[^/.]+\..+/i, "");
+		if (existsSync(dir))
+			return;
+		await mkdir(dir.replace(/[^/.]+\..+/i, ""), { recursive: true });
 	}
 }

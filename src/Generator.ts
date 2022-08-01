@@ -7,6 +7,7 @@ export class Generator {
 	constructor(
 		private readonly printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
 	) {}
+	
 	public generate(
 		output: string,
 		schema: ISchema,

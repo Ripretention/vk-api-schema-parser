@@ -6,55 +6,44 @@ import { ErrorSchemaParser } from "./src/parsers/ErrorSchemaParser";
 import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
 import { MethodSchemaParser } from "./src/parsers/MethodSchemaParser";
 import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParser";
+import { toUpperFirstChar } from "./src/Utils";
+import { BaseSchemaParser } from "./src/parsers/BaseSchemaParser";
 
 const generator = new Generator();
+const outputDir = process.argv?.[2] ?? "./vkschema";
+
+async function genenrate(schemaName: string, parser: BaseSchemaParser<any>) {
+	let schemaDownloader = new SchemaDownloader(schemaName);
+	console.log(`⇩ downloading raw ${schemaName} schema...`);
+	await schemaDownloader.download(`${outputDir}/${schemaName}.json`);
+	console.log(`✔ ${schemaName} schema has been downloaded`);
+
+	console.log(`⟳ generating ${schemaName} schema...`);
+	await generator.generate(
+		`${outputDir}/${toUpperFirstChar(schemaName)}.ts`, 
+		require(`.${outputDir}/${schemaName}.json`), 
+		parser
+	);
+	
+	console.log("\n");
+	return {
+		id: ts.factory.createIdentifier(toUpperFirstChar(schemaName)),
+		label: schemaName,
+		path: `./${toUpperFirstChar(schemaName)}.ts`
+	};
+}
 (async () => {
-	await downloadSchema("objects");
-	console.log("⟳ generating objects schema...");
-	await generator.generate(
-		"Objects.ts", 
-		require("../objects.json"), 
-		new ObjectSchemaParser()
-	);
-	const objectsNamespace: INamespace = {
-		id: ts.factory.createIdentifier("Objects"),
-		label: "objects",
-		path: "./Objects.ts"
-	};
-
-	await downloadSchema("errors");
-	console.log("⟳ generating errors schema...");
-	await generator.generate(
-		"Errors.ts", 
-		require("../errors.json"), 
-		new ErrorSchemaParser()
-	);
-	const errorsNamespace: INamespace = {
-		id: ts.factory.createIdentifier("Errors"),
-		label: "errors",
-		path: "./Errors.ts"
-	};
-
-	await downloadSchema("responses");
-	console.log("⟳ generating responses schema...");
-	await generator.generate(
-		"Responses.ts", 
-		require("../responses.json"), 
+	let objectsNamespace = await genenrate("objects", new ObjectSchemaParser());
+	let errorsNamespace = await genenrate("errors", new ErrorSchemaParser());
+	let responsesNamespace = await genenrate(
+		"responses", 
 		new ResponseObjectParser([
 			objectsNamespace
 		])
 	);
-	const responsesNamespace: INamespace = {
-		id: ts.factory.createIdentifier("Responses"),
-		label: "responses",
-		path: "./Responses.ts"
-	};
-
-	await downloadSchema("methods");
-	console.log("⟳ generating methods schema...");
-	await generator.generate(
-		"Methods.ts", 
-		require("../methods.json"), 
+	
+	await genenrate(
+		"methods", 
 		new MethodSchemaParser([
 			errorsNamespace,
 			objectsNamespace,
@@ -66,10 +55,3 @@ const generator = new Generator();
 })().catch(e => {
 	throw e;
 });
-
-async function downloadSchema(name) {
-	let schemaDownloader = new SchemaDownloader(name);
-	console.log(`⇩ downloading raw ${name} schema...`);
-	await schemaDownloader.download(`${name}.json`);
-	console.log(`✔ ${name} schema has been downloaded`);
-}
