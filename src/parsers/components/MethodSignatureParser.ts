@@ -18,6 +18,23 @@ export class MethodSignatureParser {
 		methodName: string, 
 		method: IMethod
 	) {
+		let methodBody = ts.factory.createBlock([
+			ts.factory.createReturnStatement(
+				ts.factory.createCallExpression(
+					ts.factory.createIdentifier("this.callMethod"),
+					[],
+					[
+						ts.factory.createStringLiteral(
+							method.name
+						),
+						ts.factory.createAsExpression(
+							ts.factory.createIdentifier("params"),
+							ts.factory.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword)
+						)
+					]
+				)
+			)
+		]);
 		let methodFn = ts.factory.createMethodDeclaration(
 			[],
 			[
@@ -37,27 +54,14 @@ export class MethodSignatureParser {
 					this.parseParameters(method)
 				)
 			],
-			this.typeSignatureResolver.resolve({
-				type: undefined,
-				anyOf: Object.values(method.responses)
-			}),
-			ts.factory.createBlock([
-				ts.factory.createReturnStatement(
-					ts.factory.createCallExpression(
-						ts.factory.createIdentifier("this.callMethod"),
-						[],
-						[
-							ts.factory.createStringLiteral(
-								method.name
-							),
-							ts.factory.createAsExpression(
-								ts.factory.createIdentifier("params"),
-								ts.factory.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword)
-							)
-						]
-					)
-				)
-			])
+			ts.factory.createTypeReferenceNode(
+				"Promise",
+				[this.typeSignatureResolver.resolve({
+					type: undefined,
+					anyOf: Object.values(method.responses)
+				})]
+			),
+			methodBody
 		);
 
 		return this.metadataResolver?.resolve(methodFn, method) ?? methodFn;

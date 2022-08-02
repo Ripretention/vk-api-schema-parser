@@ -56,7 +56,10 @@ export class MethodCategoryParser {
 					ts.factory.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword)
 				)
 			],
-			result: ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+			result: ts.factory.createTypeReferenceNode(
+				"Promise",
+				[ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)]
+			)
 		};
 	}
 	private createCategoryConstructor() {
