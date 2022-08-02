@@ -15,9 +15,6 @@ const isAutoCleanUpActivated = process.argv
 	.slice(2, process.argv.length)
 	.some(arg => arg === "-c");
 
-console.log(process.argv
-	.slice(2, process.argv.length));
-
 async function genenrate(schemaName: string, parser: BaseSchemaParser<any>) {
 	let schemaDownloader = new SchemaDownloader(schemaName);
 	console.log(`⇩ downloading raw ${schemaName} schema...`);

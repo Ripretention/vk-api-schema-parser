@@ -20,7 +20,7 @@ test("should return a subcodes schema", () => {
 		}, 
 		errors: {}
 	};
-
+	
 	const result = printer.printList(
 		ts.ListFormat.MultiLine, 
 		errorSchemaParser.parse(schema),

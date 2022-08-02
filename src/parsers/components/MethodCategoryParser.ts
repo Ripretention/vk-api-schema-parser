@@ -24,7 +24,9 @@ export class MethodCategoryParser {
 
 		return ts.factory.createClassDeclaration(
 			[],
-			[],
+			[
+				ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)
+			],
 			toUpperFirstChar(categoryName),
 			[],
 			[],
@@ -34,10 +36,9 @@ export class MethodCategoryParser {
 		);
 	}
 	
-	private createCategoryConstructor() {
-		let callMethodFunction = ts.factory.createFunctionTypeNode(
-			[],
-			[
+	public get callMethodSignature() {
+		return {
+			parameters: [
 				ts.factory.createParameterDeclaration(
 					[],
 					[],
@@ -55,7 +56,14 @@ export class MethodCategoryParser {
 					ts.factory.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword)
 				)
 			],
-			ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+			result: ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+		};
+	}
+	private createCategoryConstructor() {
+		let callMethodFunction = ts.factory.createFunctionTypeNode(
+			[],
+			this.callMethodSignature.parameters,
+			this.callMethodSignature.result
 		);
 		let constructorParams = [
 			ts.factory.createParameterDeclaration(

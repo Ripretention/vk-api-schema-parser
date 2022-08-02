@@ -1,4 +1,5 @@
 import * as ts from "typescript";
+import { toUpperFirstChar } from "../Utils";
 import { BaseSchemaParser } from "./BaseSchemaParser";
 import { IMethod } from "../types/jsonschema/IMethod";
 import { IMethodSchema } from "../types/jsonschema/ISchema";
@@ -27,7 +28,60 @@ export class MethodSchemaParser extends BaseSchemaParser<IMethodSchema> {
 		}
 
 		return ts.factory.createNodeArray(
-			this.createNamespaceImportDeclaration().concat(parsedCategories)
+			this.createNamespaceImportDeclaration()
+				.concat(parsedCategories)
+				.concat(this.createIndexClass(Object.keys(categories)))
+		);
+	}
+
+	private createIndexClass(categories: string[]): any {
+		let abstractCallMethod = ts.factory.createMethodDeclaration(
+			[],
+			[
+				ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
+				ts.factory.createModifier(ts.SyntaxKind.AbstractKeyword)
+			],
+			undefined,
+			"callMethod",
+			undefined,
+			[],
+			this.methodCategoryParser.callMethodSignature.parameters,
+			this.methodCategoryParser.callMethodSignature.result,
+			undefined
+		);
+		let properties = categories.map(category => 
+			ts.factory.createPropertyDeclaration(
+				[],
+				[
+					ts.factory.createModifier(ts.SyntaxKind.PublicKeyword),
+					ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)
+				],
+				category.toLocaleLowerCase(),
+				undefined,
+				undefined,
+				ts.factory.createNewExpression(
+					ts.factory.createIdentifier(toUpperFirstChar(category)), 
+					[], 
+					[
+						ts.factory.createIdentifier("this.callMethod")
+					]
+				)
+			)
+		);
+
+		return ts.factory.createClassDeclaration(
+			[],
+			[
+				ts.factory.createModifier(ts.SyntaxKind.ExportKeyword),
+				ts.factory.createModifier(ts.SyntaxKind.AbstractKeyword)
+			],
+			"Api",
+			[],
+			[],
+			[
+				abstractCallMethod,
+				...properties
+			]
 		);
 	}
 }
