@@ -1,9 +1,9 @@
-import * as ts from "typescript";
+import { Printer } from "./helpers/Printer";
 import { IErrorSchema } from "../src/types/jsonschema/ISchema";
 import { ErrorSchemaParser } from "../src/parsers/ErrorSchemaParser";
 
 const errorSchemaParser = new ErrorSchemaParser();
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const printer = new Printer();
 test("should return a subcodes schema", () => {
 	let schema: IErrorSchema = {
 		$schema: "",
@@ -22,9 +22,7 @@ test("should return a subcodes schema", () => {
 	};
 	
 	const result = printer.printList(
-		ts.ListFormat.MultiLine, 
-		errorSchemaParser.parse(schema),
-		undefined
+		errorSchemaParser.parse(schema)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
@@ -51,10 +49,8 @@ test("should return a error schema", () => {
 		}
 	};
 
-	const result = printer.printList(
-		ts.ListFormat.MultiLine, 
-		errorSchemaParser.parse(schema),
-		undefined
+	const result = printer.printList( 
+		errorSchemaParser.parse(schema)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
@@ -104,9 +100,7 @@ test("should return a error with subcodes schema", () => {
 	};
 
 	const result = printer.printList(
-		ts.ListFormat.MultiLine, 
-		errorSchemaParser.parse(schema),
-		undefined
+		errorSchemaParser.parse(schema)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`

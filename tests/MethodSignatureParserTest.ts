@@ -1,9 +1,9 @@
-import * as ts from "typescript";
 import { IMethod } from "../src/types/jsonschema/IMethod";
 import { MethodSignatureParser } from "../src/parsers/components/MethodSignatureParser";
+import { Printer } from "./helpers/Printer";
 
 const parser = new MethodSignatureParser();
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const printer = new Printer();
 
 test("should return a method with basic arguments and a primitive result", () => {
 	let method: IMethod = {
@@ -25,10 +25,8 @@ test("should return a method with basic arguments and a primitive result", () =>
 		}
 	};
 
-	const result = printer.printNode(
-		ts.EmitHint.Unspecified, 
-		parser.parse("fn", method),
-		undefined
+	const result = printer.print( 
+		parser.parse("fn", method)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
@@ -109,10 +107,8 @@ test("should return a method with complex arguments and a complex result", () =>
 		}
 	};
 
-	const result = printer.printNode(
-		ts.EmitHint.Unspecified, 
-		parser.parse("fn", method),
-		undefined
+	const result = printer.print(
+		parser.parse("fn", method)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`

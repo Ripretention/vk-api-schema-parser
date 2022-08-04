@@ -1,11 +1,11 @@
 import * as ts from "typescript";
+import { Printer } from "./helpers/Printer";
 import { PropertyType } from "../src/types/jsonschema/PropertyType";
 import { PropertySignatureParser } from "../src/parsers/components/PropertySignatureParser";
-import { TypeMetadataResolver } from "../src/resolvers/TypeMetadataResolver";
 import { IArrayProperty, IEnumProperty, IObjectProperty, IProperty } from "../src/types/jsonschema/IProperty";
 
-const parser = new PropertySignatureParser(new TypeMetadataResolver());
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const parser = new PropertySignatureParser();
+const printer = new Printer();
 
 describe("primitive property test", () => {
 	test("should return a string property", () => primitivePropTypeTest("string"));
@@ -56,10 +56,8 @@ describe("mixed property test", () => {
 			]
 		};
 	
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("mixedProperty", mixedProperty),
-			undefined
+		const result = printer.print(
+			parser.parse("mixedProperty", mixedProperty)
 		);
 
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -78,10 +76,8 @@ describe("array property test", () => {
 			type: "array"
 		};
 
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("array", array),
-			undefined
+		const result = printer.print(
+			parser.parse("array", array)
 		);
 
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -103,10 +99,8 @@ describe("tuple property test", () => {
 			]
 		};
 
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("tuple", tupleProperty),
-			undefined
+		const result = printer.print(
+			parser.parse("tuple", tupleProperty)
 		);
 
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -141,10 +135,8 @@ describe("tuple property test", () => {
 			]
 		};
 
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("tuple", tupleProperty),
-			undefined
+		const result = printer.print(
+			parser.parse("tuple", tupleProperty)
 		);
 
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -171,10 +163,8 @@ describe("object property test", () => {
 			}
 		};
 
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("object", tupleProperty),
-			undefined
+		const result = printer.print(
+			parser.parse("object", tupleProperty)
 		);
 
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -235,10 +225,8 @@ describe("object property test", () => {
 			required: ["enumProp", "mixedProp"]
 		};
 
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("object", tupleProperty),
-			undefined
+		const result = printer.print(
+			parser.parse("object", tupleProperty)
 		);
 
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -271,10 +259,8 @@ describe("union property test", () => {
 			]
 		};
 	
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("allOf", allOfProp),
-			undefined
+		const result = printer.print(
+			parser.parse("allOf", allOfProp)
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -294,10 +280,8 @@ describe("union property test", () => {
 			]
 		};
 	
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("anyOf", anyOfProp),
-			undefined
+		const result = printer.print( 
+			parser.parse("anyOf", anyOfProp)
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -340,10 +324,8 @@ describe("union property test", () => {
 			]
 		};
 	
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("allOf", allOfProp),
-			undefined
+		const result = printer.print(
+			parser.parse("allOf", allOfProp)
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -379,10 +361,8 @@ describe("union property test", () => {
 			]
 		};
 	
-		const result = printer.printNode(
-			ts.EmitHint.Unspecified, 
-			parser.parse("oneOf", oneOfProp),
-			undefined
+		const result = printer.print(
+			parser.parse("oneOf", oneOfProp)
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`
@@ -403,12 +383,15 @@ function primitivePropTypeTest(
 	isOptional = false, 
 	expectedType = type as string
 ) {
-	let prop = parser.parse("test", {
+	let prop: IProperty<typeof type> = {
 		type: type,
 		description: `super ${type}`
-	}, isReadonly, isOptional);
+	};
 
-	const result = printer.printNode(ts.EmitHint.Unspecified, prop, undefined);
+	const result = printer.print(
+		parser.parse("test", prop, isReadonly, isOptional)
+	);
+	
 	expect(result.replace(/\s/g, "")).toBe(`
 		/*** super ${type} */
 		${isReadonly ? "readonly " : ""}test${isOptional ? "?:" : ":"} ${expectedType};
@@ -420,12 +403,15 @@ function enumPropTypeTest<VType>(
 	isOptional = false, 
 	values: VType[]
 ) {
-	let prop = parser.parse("test", {
+	let prop: IEnumProperty<typeof type> = {
 		type: type,
 		enum: values
-	} as IEnumProperty<any>, isReadonly, isOptional);
+	};
 
-	const result = printer.printNode(ts.EmitHint.Unspecified, prop, undefined);
+	const result = printer.print(
+		parser.parse("test", prop, isReadonly, isOptional)
+	);
+
 	expect(result.replace(/\s/g, "")).toBe(`
 		${isReadonly ? "readonly " : ""}test${isOptional ? "?:" : ":"} ${values.map(v => typeof v === "string" ? `"${v}"` : v).join("|")};
 	`.replace(/\s/g, ""));
@@ -435,11 +421,14 @@ function mixedPropTypeTest(
 	isReadonly = false, 
 	isOptional = false
 ) {
-	let prop = parser.parse("test", {
+	let prop: IProperty<typeof type> = {
 		type: type
-	} as IProperty<any>, isReadonly, isOptional);
+	};
 
-	const result = printer.printNode(ts.EmitHint.Unspecified, prop, undefined);
+	const result = printer.print(
+		parser.parse("test", prop, isReadonly, isOptional)
+	);
+
 	expect(result.replace(/\s/g, "")).toBe(`
 		${isReadonly ? "readonly " : ""}test${isOptional ? "?:" : ":"} ${type.join("|")};
 	`.replace(/\s/g, ""));
@@ -450,14 +439,17 @@ function arrayPropTypeTest(
 	isOptional = false, 
 	expectedType = type as string
 ) {
-	let prop = parser.parse("test", {
+	let prop: IArrayProperty = {
 		type: "array",
 		items: {
 			type
 		}
-	} as IArrayProperty, isReadonly, isOptional);
+	};
 
-	const result = printer.printNode(ts.EmitHint.Unspecified, prop, undefined);
+	const result = printer.print(
+		parser.parse("test", prop, isReadonly, isOptional)
+	);
+
 	expect(result.replace(/\s/g, "")).toBe(`
 		${isReadonly ? "readonly " : ""}test${isOptional ? "?:" : ":"} ${expectedType}[];
 	`.replace(/\s/g, ""));

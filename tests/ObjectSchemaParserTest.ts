@@ -1,10 +1,10 @@
-import * as ts from "typescript";
+import { Printer } from "./helpers/Printer";
 import { IPropertySchema } from "../src/types/jsonschema/ISchema";
 import { ObjectSchemaParser } from "../src/parsers/ObjectSchemaParser";
 import { IObjectProperty, IReferenceProperty } from "../src/types/jsonschema/IProperty";
 
 const objectSchemaParser = new ObjectSchemaParser();
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const printer =  new Printer();
 test("should return a primitive interface-based schema", () => {
 	let schema: IPropertySchema = {
 		$schema: "https://json.com",
@@ -33,9 +33,7 @@ test("should return a primitive interface-based schema", () => {
 	};
 
 	const result = printer.printList(
-		ts.ListFormat.MultiLine, 
-		objectSchemaParser.parse(schema),
-		undefined
+		objectSchemaParser.parse(schema)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
@@ -85,9 +83,7 @@ describe("objects references test", () => {
 		};
 	
 		const result = printer.printList(
-			ts.ListFormat.MultiLine, 
-			objectSchemaParser.parse(schema),
-			undefined
+			objectSchemaParser.parse(schema)
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`	
@@ -173,9 +169,7 @@ describe("objects references test", () => {
 		};
 	
 		const result = printer.printList(
-			ts.ListFormat.MultiLine, 
-			objectSchemaParser.parse(schema),
-			undefined
+			objectSchemaParser.parse(schema)
 		);
 	
 		expect(result.replace(/\s/g, "")).toBe(`	

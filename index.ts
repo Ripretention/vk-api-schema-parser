@@ -3,11 +3,13 @@ import { unlink } from "fs/promises";
 import { Generator } from "./src/Generator";
 import { toUpperFirstChar } from "./src/Utils";
 import { SchemaDownloader } from "./src/SchemaDownloader";
-import { BaseSchemaParser } from "./src/parsers/BaseSchemaParser";
-import { ErrorSchemaParser } from "./src/parsers/ErrorSchemaParser";
-import { ObjectSchemaParser } from "./src/parsers/ObjectSchemaParser";
-import { MethodSchemaParser } from "./src/parsers/MethodSchemaParser";
-import { ResponseObjectParser } from "./src/parsers/ResponseSchemaParser";
+import { 
+	BaseSchemaParser,
+	ErrorSchemaParser,
+	ObjectSchemaParser,
+	MethodSchemaParser,
+	ResponseObjectParser
+} from "./src/parsers";
 
 const generator = new Generator();
 const outputDir = process.argv?.[2] ?? "./vkschema";

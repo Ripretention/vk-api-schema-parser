@@ -1,9 +1,9 @@
-import * as ts from "typescript";
+import { Printer } from "./helpers/Printer";
 import { IMethod } from "../src/types/jsonschema/IMethod";
 import { MethodCategoryParser } from "../src/parsers/components/MethodCategoryParser";
 
 const parser = new MethodCategoryParser();
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const printer = new Printer();
 
 test("should return a users category", () => {
 	let methods: IMethod[] = [
@@ -62,10 +62,8 @@ test("should return a users category", () => {
 		}
 	];
 
-	const result = printer.printNode(
-		ts.EmitHint.Unspecified, 
-		parser.parse("users", methods),
-		undefined
+	const result = printer.print(
+		parser.parse("users", methods)
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
