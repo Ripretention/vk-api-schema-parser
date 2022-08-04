@@ -69,27 +69,27 @@ test("should return a users category", () => {
 	);
 
 	expect(result.replace(/\s/g, "")).toBe(`
-		class Users {
+		export class Users {
 			public get(params: {
 				count: number;
 				fields: "first_name" | "last_name";
-			}): {
+			}): Promise<{
 				first_name?: string;
 				last_name?: string;
-			} {
+			}> {
 				return this.callMethod("users.get", params as object);
 			}
 
 			public find(params: {
 				first_name: string;
 				last_name: string;
-			}): {
+			}): Promise<{
 				user_id?: number;
-			} {
+			}> {
 				return this.callMethod("users.find", params as object);
 			}
 
-			constructor(private readonly callMethod: (methodName: string, params: object) => any) {}
+			constructor(private readonly callMethod: (methodName: string, params: object) => Promise<any>) {}
 		}
 	`.replace(/\s/g, ""));
 	

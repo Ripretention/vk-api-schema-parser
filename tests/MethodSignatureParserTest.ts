@@ -35,7 +35,7 @@ test("should return a method with basic arguments and a primitive result", () =>
 		public fn(params: {
 			some_int: number;
 			some_string: string;
-		}): number {
+		}): Promise<number> {
 			return this.callMethod("some.name", params as object);
 		}
 	`.replace(/\s/g, ""));
@@ -136,12 +136,12 @@ test("should return a method with complex arguments and a complex result", () =>
 				field1?: string;
 				field2?: number[];
 			};
-		}): number | {
+		}): Promise<number | {
 			count?: number;
 			users?: {
 				name?: string;
 			}[];
-		} {
+		}> {
 			return this.callMethod("users.search", params as object);
 		}
 	`.replace(/\s/g, ""));
