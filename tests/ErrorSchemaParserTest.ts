@@ -2,8 +2,8 @@ import { Printer } from "./helpers/Printer";
 import { IErrorSchema } from "../src/types/jsonschema/ISchema";
 import { ErrorSchemaParser } from "../src/parsers/ErrorSchemaParser";
 
-const errorSchemaParser = new ErrorSchemaParser();
 const printer = new Printer();
+const errorSchemaParser = new ErrorSchemaParser();
 test("should return a subcodes schema", () => {
 	let schema: IErrorSchema = {
 		$schema: "",
@@ -64,6 +64,7 @@ test("should return a error schema", () => {
 		export interface SomeError2 {
 			code: 2;
 		}
+		export type VkGlobalError = SomeError;
 	`.replace(/\s/g, ""));
 });
 test("should return a error with subcodes schema", () => {
@@ -113,5 +114,6 @@ test("should return a error with subcodes schema", () => {
 			code: 1 | SomeSubcode | SomeSubcode2;
 			global: true;
 		}
+		export type VkGlobalError = SomeError;
 	`.replace(/\s/g, ""));
 });

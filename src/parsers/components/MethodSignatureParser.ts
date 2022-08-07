@@ -1,7 +1,7 @@
 import * as ts from "typescript";
 import { INamespace } from "../../types/INamespace";
 import { IMethod } from "../../types/jsonschema/IMethod";
-import { IProperty } from "../../types/jsonschema/IProperty";
+import { IProperty, IReferenceProperty } from "../../types/jsonschema/IProperty";
 import { PropertySignatureParser } from "./PropertySignatureParser";
 import { TypeMetadataResolver } from "../../resolvers/TypeMetadataResolver";
 import { TypeSignatureResolver } from "../../resolvers/TypeSignatureResolver";
@@ -35,6 +35,29 @@ export class MethodSignatureParser {
 				)
 			)
 		]);
+
+		let response = this.typeSignatureResolver.resolve({
+			type: undefined,
+			anyOf: Object.values(method.responses)
+		}) as ts.UnionOrIntersectionTypeNode;
+
+		if (method.errors?.length) {
+			let errors = this.typeSignatureResolver.resolve({
+				type: undefined,
+				anyOf: Object.values(method.errors) as IReferenceProperty[]
+			});
+			response = ts.factory.createUnionTypeNode(
+				response.types.map(type => 
+					ts.isQualifiedName(type)
+						? ts.factory.createTypeReferenceNode(
+							type,
+							[errors]
+						) 
+						: type
+				)
+			);	
+		}
+		
 		let methodFn = ts.factory.createMethodDeclaration(
 			[],
 			[
@@ -56,10 +79,7 @@ export class MethodSignatureParser {
 			],
 			ts.factory.createTypeReferenceNode(
 				"Promise",
-				[this.typeSignatureResolver.resolve({
-					type: undefined,
-					anyOf: Object.values(method.responses)
-				})]
+				[ response ]
 			),
 			methodBody
 		);

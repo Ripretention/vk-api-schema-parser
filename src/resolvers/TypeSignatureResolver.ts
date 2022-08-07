@@ -52,7 +52,7 @@ export class TypeSignatureResolver {
 	}
 
 	public resolveReferenceType(object: IReferenceProperty) {
-		let { 1: namespaceLabel, 2: reference } = object.$ref.match(/^(?:([^#]+).json)?#\/(?:error|definitions)\/(.+)/);
+		let { 1: namespaceLabel, 2: reference } = object.$ref.match(/^(?:([^#]+).json)?#\/(?:errors?|definitions)\/(.+)/);
 		let referenceIdentifier = ts.factory.createIdentifier(toPascalCase(reference));
 
 		return this.namespaces?.length

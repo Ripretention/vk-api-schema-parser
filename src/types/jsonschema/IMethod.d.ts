@@ -9,7 +9,7 @@ export interface IMethod extends IMetadata {
     responses: {
         [key: string]: SupporetedTypes;
     };
-    errors?: IError[];
+    errors?: (IReferenceProperty | IError)[];
 }
 type SupporetedTypes = 
     IProperty<any> |

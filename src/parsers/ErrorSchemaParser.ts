@@ -10,6 +10,7 @@ export class ErrorSchemaParser extends BaseSchemaParser<IErrorSchema> {
 	public parse(schema: IErrorSchema) {
 		let errors = [];
 		let definitions = [];
+		let globalErrors = [];
 
 		for (let [name, body] of Object.entries(schema.definitions.subcodes))
 			definitions.push(
@@ -23,6 +24,11 @@ export class ErrorSchemaParser extends BaseSchemaParser<IErrorSchema> {
 			);
 		
 		for (let [name, body] of Object.entries(schema.errors)) {
+			if (body.global)
+				globalErrors.push(
+					ts.factory.createIdentifier(toPascalCase(name))
+				);
+
 			let error = ts.factory.createInterfaceDeclaration(
 				undefined,
 				[ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
@@ -35,6 +41,17 @@ export class ErrorSchemaParser extends BaseSchemaParser<IErrorSchema> {
 				this.metadataResolver.resolve(error, body) ?? error
 			);
 		}
+
+		if (globalErrors.length)
+			errors.push(
+				ts.factory.createTypeAliasDeclaration(
+					[],
+					[ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], 
+					toPascalCase("VkGlobalError"), 
+					undefined,
+					ts.factory.createUnionTypeNode(globalErrors)
+				)
+			);
 
 		return ts.factory.createNodeArray(
 			definitions.concat(errors)
