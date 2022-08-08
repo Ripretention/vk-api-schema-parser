@@ -11,55 +11,73 @@ import {
 	ResponseObjectParser
 } from "./src/parsers";
 
-const generator = new Generator();
-const outputDir = process.argv?.[2] ?? "./vkschema";
-const isAutoCleanUpActivated = process.argv
-	.slice(2, process.argv.length)
-	.some(arg => arg === "-c");
+export default class VkApiSchemaParser {
+	private readonly generator = new Generator();
+	constructor(
+		private readonly logger: (message: string) => any
+	) {}
 
-async function genenrate(schemaName: string, parser: BaseSchemaParser<any>) {
-	let schemaDownloader = new SchemaDownloader(schemaName);
-	console.log(`⇩ downloading raw ${schemaName} schema...`);
-	await schemaDownloader.download(`${outputDir}/${schemaName}.json`);
-	console.log(`✔ ${schemaName} schema has been downloaded`);
+	public async parse(outputDir = "./vkschema", autoCleanUp = false) {
+		let objectsNamespace = await this.parseSchema(
+			"objects", 
+			new ObjectSchemaParser(),
+			outputDir,
+			autoCleanUp,
+		);
+		let errorsNamespace = await this.parseSchema(
+			"errors", 
+			new ErrorSchemaParser(),
+			outputDir,
+			autoCleanUp
+		);
+		let responsesNamespace = await this.parseSchema(
+			"responses", 
+			new ResponseObjectParser([
+				objectsNamespace
+			]),
+			outputDir,
+			autoCleanUp,
+		);
+		
+		await this.parseSchema(
+			"methods", 
+			new MethodSchemaParser([
+				errorsNamespace,
+				objectsNamespace,
+				responsesNamespace
+			]), 
+			outputDir,
+			autoCleanUp,
+		);
 
-	console.log(`⟳ generating ${schemaName} schema...`);
-	await generator.generate(
-		`${outputDir}/${toUpperFirstChar(schemaName)}.ts`, 
-		require(`.${outputDir}/${schemaName}.json`), 
-		parser
-	);
-	
-	if (isAutoCleanUpActivated)
-		await unlink(`${outputDir}/${schemaName}.json`);
+		this?.logger("✔ schemas have been created");
+	}
+	private async parseSchema( 
+		schemaName: string,
+		parser: BaseSchemaParser<any>,
+		outputDir: string, 
+		autoCleanUp: boolean
+	) {
+		let schemaDownloader = new SchemaDownloader(schemaName);
+		this?.logger(`⇩ downloading raw ${schemaName} schema...`);
+		await schemaDownloader.download(`${outputDir}/${schemaName}.json`);
+		this?.logger(`✔ ${schemaName} schema has been downloaded`);
 
-	console.log("\n");
-	return {
-		id: ts.factory.createIdentifier(toUpperFirstChar(schemaName)),
-		label: schemaName,
-		path: `./${toUpperFirstChar(schemaName)}.ts`
-	};
+		this?.logger(`⟳ generating ${schemaName} schema...`);
+		await this.generator.generate(
+			`${outputDir}/${toUpperFirstChar(schemaName)}.ts`, 
+			require(`.${outputDir}/${schemaName}.json`), 
+			parser
+		);
+		
+		if (autoCleanUp)
+			await unlink(`${outputDir}/${schemaName}.json`);
+
+		this?.logger("\n");
+		return {
+			id: ts.factory.createIdentifier(toUpperFirstChar(schemaName)),
+			label: schemaName,
+			path: `./${toUpperFirstChar(schemaName)}.ts`
+		};
+	}
 }
-(async () => {
-	let objectsNamespace = await genenrate("objects", new ObjectSchemaParser());
-	let errorsNamespace = await genenrate("errors", new ErrorSchemaParser());
-	let responsesNamespace = await genenrate(
-		"responses", 
-		new ResponseObjectParser([
-			objectsNamespace
-		])
-	);
-	
-	await genenrate(
-		"methods", 
-		new MethodSchemaParser([
-			errorsNamespace,
-			objectsNamespace,
-			responsesNamespace
-		])
-	);
-
-	console.log("✔ schemas have been created");
-})().catch(e => {
-	throw e;
-});
