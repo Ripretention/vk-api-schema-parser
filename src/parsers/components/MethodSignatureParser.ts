@@ -41,22 +41,24 @@ export class MethodSignatureParser {
 			anyOf: Object.values(method.responses)
 		}) as ts.UnionOrIntersectionTypeNode;
 
-		if (method.errors?.length) {
-			let errors = this.typeSignatureResolver.resolve({
-				type: undefined,
-				anyOf: Object.values(method.errors) as IReferenceProperty[]
-			});
-			response = ts.factory.createUnionTypeNode(
-				response.types.map(type => 
-					ts.isQualifiedName(type)
-						? ts.factory.createTypeReferenceNode(
-							type,
-							[errors]
-						) 
-						: type
-				)
-			);	
-		}
+		let errors = this.typeSignatureResolver.resolve({
+			type: undefined,
+			anyOf: [
+				{
+					$ref: "errors.json#/errors/vk_global_error"
+				} as IReferenceProperty
+			].concat(Object.values(method?.errors ?? {}) as IReferenceProperty[])
+		});
+		response = ts.factory.createUnionTypeNode(
+			response.types.map(type => 
+				ts.isQualifiedName(type)
+					? ts.factory.createTypeReferenceNode(
+						type,
+						[errors]
+					) 
+					: type
+			)
+		);	
 		
 		let methodFn = ts.factory.createMethodDeclaration(
 			[],
