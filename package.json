@@ -1,6 +1,6 @@
 {
   "name": "vk-api-schema-parser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Parse JSON-Schema from the official git repository of VKontakte",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "lint": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "start": "node dist/index.js",
+    "cli": "node dist/cli.js",
     "build": "tsc -p tsconfig.build.json",
     "postinstall": "tsc -p tsconfig.build.json",
     "wDebug": "@powershell -Command $env:DEBUG='*';node dist/index.js",

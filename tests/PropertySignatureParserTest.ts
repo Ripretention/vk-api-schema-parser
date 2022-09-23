@@ -1,4 +1,3 @@
-import * as ts from "typescript";
 import { Printer } from "./helpers/Printer";
 import { PropertyType } from "../src/types/jsonschema/PropertyType";
 import { PropertySignatureParser } from "../src/parsers/components/PropertySignatureParser";
