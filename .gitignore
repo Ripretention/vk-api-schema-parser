@@ -1,7 +1,6 @@
 dist
 node_modules
 *.json
-package-lock.json
 Objects.ts
 Responses.ts
 Errors.ts

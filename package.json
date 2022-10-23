@@ -2,7 +2,7 @@
   "name": "vk-api-schema-parser",
   "version": "1.1.0",
   "description": "Parse JSON-Schema from the official git repository of VKontakte",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "jest --config jest.config.json --maxWorkers=1",
     "lint": "eslint . --ext .ts",

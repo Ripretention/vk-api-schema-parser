@@ -1,14 +1,14 @@
 # VK API SCHEMA PARSER
 <p align="right">
-  is easy to usage Node.js module, written on TypeScript, that allows you to parse official VK API Schemas (JSONSchema) and generate pretty and clear entities of VK API
+  is easy to use Node.js module, written on TypeScript, that allows you to parse official VK API Schemas (JSONSchema) and generate pretty and clear entities of VK API
 </p>
 
 
 ## Feautres
- - All errors is provided.
+ - All errors are provided.
  - Easy to usage
  - *100%* coverage of VK API Schemas
- - Most of metadates of schemas (even unique for VK API Schemas) is provided, using JSDoc
+ - Most of metadates of schemas (even unique for VK API Schemas) are provided through JSDoc
  
  ## Parsing schemas
 ```typescript
